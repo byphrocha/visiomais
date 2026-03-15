@@ -315,25 +315,31 @@
       .nav-item{padding:13px 10px;font-size:.68rem;gap:4px;flex-shrink:0;letter-spacing:.02em}
       .nav-item svg{width:14px;height:14px}
       .main-container{padding:12px 12px}
-      .filters-sidebar{margin:0 -12px}
-      .filter-section{padding:12px}
+      .filters-sidebar{margin:0 -12px;background:#f8f9fa;border-bottom:2px solid rgba(196,163,90,.1)}
+      .filter-section{padding:14px 12px;border-bottom:1px solid var(--gray-lt)}
       .product-grid{grid-template-columns:1fr;gap:10px}
       .product-visual{height:160px}
-      .product-body{padding:10px}
-      .product-brand{font-size:.65rem;margin-bottom:2px}
-      .product-name{font-size:.85rem;margin-bottom:2px}
-      .product-spec{font-size:.7rem;margin-bottom:6px}
-      .product-desc{font-size:.75rem;min-height:30px;margin-bottom:4px}
-      .price-old{font-size:.75rem}
-      .price-new{font-size:1rem}
-      .product-cta{font-size:.7rem;padding:6px}
+      .product-body{padding:12px}
+      .product-brand{font-size:.7rem;margin-bottom:4px}
+      .product-name{font-size:.9rem;margin-bottom:4px;font-weight:600}
+      .product-spec{font-size:.75rem;margin-bottom:8px}
+      .product-desc{font-size:.8rem;min-height:30px;margin-bottom:6px}
+      .price-old{font-size:.8rem}
+      .price-new{font-size:1.15rem;font-weight:700}
+      .product-cta{font-size:.85rem;padding:10px;font-weight:700}
       .product-rating{margin-bottom:8px}
       .product-rating svg{width:12px;height:12px}
-      .btn-clear-filters{font-size:.8rem;padding:8px}
-      .sort-select,.color-picker{display:none}
+      .btn-clear-filters{font-size:.85rem;padding:10px;margin-top:8px;width:100%}
+      .color-picker{display:none}
+      .sort-select{display:block !important;font-size:.85rem;padding:10px;margin-bottom:12px;width:100%}
       .filter-option label{font-size:.8rem}
-      .price-inputs{gap:6px}
-      .price-inputs input{font-size:.7rem;padding:6px}
+      .filter-section h4{font-size:.85rem;font-weight:700}
+      .filter-toggle{transition:transform .2s}
+      .filter-section.open .filter-toggle{transform:rotate(180deg)}
+      .color-picker{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:8px}
+      .color-option{width:100%;aspect-ratio:1/1}
+      .price-inputs{gap:8px;margin-bottom:8px}
+      .price-inputs input{font-size:.8rem;padding:10px;border-radius:6px}
       .products-section h2{font-size:1.2rem;margin-bottom:6px}
       .products-section p{font-size:.8rem;margin-bottom:16px}
       .hero{padding:30px 12px;text-align:center}
