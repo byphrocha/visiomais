@@ -321,6 +321,8 @@
       .main-container{padding:12px 12px}
       .filters-sidebar{margin:0 -12px;background:#f8f9fa;border-bottom:2px solid rgba(196,163,90,.1)}
       .filter-section{padding:8px 10px;border-bottom:1px solid var(--gray-lt)}
+      .filter-group,.price-inputs,.color-picker{max-height:0;overflow:hidden;opacity:0;transition:max-height .3s ease-in-out}
+      .filter-section.open .filter-group,.filter-section.open .price-inputs,.filter-section.open .color-picker{max-height:400px;opacity:1;display:flex;flex-direction:column;margin-bottom:8px;padding-top:8px}
       .product-grid{grid-template-columns:1fr;gap:10px}
       .product-visual{height:160px}
       .product-body{padding:12px}
@@ -335,9 +337,9 @@
       .product-rating svg{width:12px;height:12px}
       .btn-clear-filters{font-size:.85rem;padding:10px;margin-top:8px;width:100%}
       .color-picker{display:none}
-      .sort-select{display:block !important;font-size:.85rem;padding:10px;margin-bottom:12px;width:100%}
+      .sort-select{display:block !important;font-size:.8rem;padding:8px 10px;margin-bottom:6px;width:100%}
       .filter-option label{font-size:.75rem}
-      .filter-section h4{font-size:.75rem;font-weight:700;margin-bottom:10px}
+      .filter-section h4{font-size:.75rem;font-weight:700;margin-bottom:0;padding-bottom:8px}
       .filter-toggle{transition:transform .2s}
       .filter-section.open .filter-toggle{transform:rotate(180deg)}
       .color-picker{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:8px}
