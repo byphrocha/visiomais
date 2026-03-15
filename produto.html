@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Ray-Ban RB5154 Clubmaster — Óptica Visiomais</title>
+  <meta name="description" content="Armação Ray-Ban RB5154 Clubmaster em acetato. Compre agora na Óptica Visiomais com frete grátis para Londrina."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --navy:#030d1f;--blue:#1858C8;--blue-dk:#0f3d91;--mist:#c8d9ff;--gold:#c4a35a;
+      --cream:#f7f4ef;--white:#fff;--gray:#64748b;--gray-lt:#e8ecf4;--success:#10b981;
+      --font-d:'Cormorant Garamond',Georgia,serif;--font-b:'DM Sans',system-ui,sans-serif;
+      --r:12px;--sh:0 8px 24px rgba(3,13,31,.08)
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font-b);background:var(--white);color:#1e293b;overflow-x:hidden}
+    ::-webkit-scrollbar{width:6px}
+    ::-webkit-scrollbar-track{background:var(--cream)}
+    ::-webkit-scrollbar-thumb{background:var(--blue);border-radius:3px}
+
+    /* BREADCRUMB */
+    .breadcrumb{padding:16px 32px;background:var(--white);border-top:1px solid rgba(196,163,90,.1);border-bottom:2px solid rgba(196,163,90,.12);max-width:1400px;margin:0 auto}
+    .breadcrumb a{color:var(--gold);text-decoration:none;font-size:.85rem;font-weight:500;transition:all .3s cubic-bezier(.34,.1,.68,.55);position:relative;padding:2px 0}
+    .breadcrumb a::after{content:'';position:absolute;bottom:-3px;left:0;width:0;height:2px;background:var(--gold);transition:width .3s cubic-bezier(.34,.1,.68,.55)}
+    .breadcrumb a:hover{color:var(--gold);opacity:.8;text-shadow:0 0 8px rgba(196,163,90,.2)}
+    .breadcrumb a:hover::after{width:100%}
+    .breadcrumb span{color:var(--gray);margin:0 10px;font-weight:400;font-size:.85rem}
+
+    /* HEADER */
+    #header{position:sticky;top:0;z-index:100;background:linear-gradient(180deg,var(--navy) 0%,rgba(3,13,31,.98) 100%);border-bottom:1px solid rgba(196,163,90,.15);padding:18px 32px;backdrop-filter:blur(8px);box-shadow:0 4px 20px rgba(0,0,0,.3);transition:all .3s cubic-bezier(.34,.1,.68,.55)}
+    .header-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:12px;text-decoration:none;transition:all .3s cubic-bezier(.34,.1,.68,.55)}
+    .logo:hover{transform:translateY(-2px)}
+    .logo-svg{width:40px;height:40px;transition:all .3s cubic-bezier(.34,.1,.68,.55)}
+    .logo:hover .logo-svg{filter:drop-shadow(0 4px 12px rgba(196,163,90,.25))}
+    .logo-text{display:flex;flex-direction:column;gap:0}
+    .logo-text span:first-child{font-family:var(--font-d);font-size:1rem;font-weight:700;background:linear-gradient(135deg,#e8d9c3,#c4a35a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;transition:all .3s}
+    .logo-text span:last-child{font-size:.55rem;color:rgba(255,255,255,.5);letter-spacing:.15em;text-transform:uppercase;transition:all .3s}
+    .logo:hover .logo-text span:last-child{color:var(--gold)}
+    .btn-back{background:rgba(255,255,255,.08);color:white;border:1px solid rgba(196,163,90,.25);padding:10px 20px;border-radius:var(--r);text-decoration:none;font-weight:600;font-size:.85rem;transition:all .3s cubic-bezier(.34,.1,.68,.55);position:relative;overflow:hidden}
+    .btn-back::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(196,163,90,.15),transparent);transition:left .5s}
+    .btn-back:hover::before{left:100%}
+    .btn-back:hover{background:rgba(196,163,90,.15);border-color:var(--gold);transform:translateY(-2px);box-shadow:0 8px 20px rgba(196,163,90,.25)}
+
+    /* PRODUCT DETAIL */
+    .product-detail{max-width:1400px;margin:0 auto;padding:60px 32px;display:grid;grid-template-columns:1.2fr 1fr;gap:80px;align-items:start}
+
+    /* GALLERY */
+    .gallery{display:flex;flex-direction:column;gap:16px}
+    .gallery-main{aspect-ratio:1;background:linear-gradient(135deg,var(--cream),rgba(24,88,200,.05));border-radius:var(--r);border:1px solid var(--gray-lt);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+    .gallery-main svg{width:100%;height:100%;max-width:400px;max-height:400px;animation:pulse 3s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.9;transform:scale(1.02)}}
+
+    .gallery-thumbs{display:flex;gap:12px}
+    .thumb{width:80px;height:80px;border-radius:8px;background:var(--cream);border:2px solid var(--gray-lt);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;position:relative}
+    .thumb:hover{border-color:var(--blue);background:rgba(24,88,200,.08);transform:translateY(-2px)}
+    .thumb.active{border-color:var(--blue);background:rgba(24,88,200,.12);box-shadow:0 4px 12px rgba(24,88,200,.2)}
+    .thumb.active::after{content:'';position:absolute;top:2px;right:2px;width:8px;height:8px;background:var(--blue);border-radius:50%}
+
+    /* INFO */
+    .product-info h1{font-size:2rem;color:var(--navy);margin-bottom:8px;line-height:1.2}
+    .product-info .brand{color:var(--blue);font-weight:700;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+    .product-info .rating{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+    .stars{display:flex;gap:3px}
+    .stars svg{width:16px;height:16px;color:var(--gold);fill:currentColor}
+    .rating-count{color:var(--gray);font-size:.9rem}
+
+    .product-price{display:flex;align-items:baseline;gap:12px;margin-bottom:32px}
+    .original{font-size:.95rem;color:var(--gray);text-decoration:line-through}
+    .current{font-size:2rem;font-weight:700;color:var(--navy)}
+    .discount{background:var(--gold);color:var(--navy);padding:4px 10px;border-radius:4px;font-size:.8rem;font-weight:700}
+
+    .specs{margin-bottom:32px;padding-bottom:32px;border-bottom:1px solid var(--gray-lt)}
+    .spec-row{display:flex;justify-content:space-between;padding:12px 0;font-size:.9rem}
+    .spec-row strong{color:var(--navy)}
+    .spec-row span{color:var(--gray)}
+
+    .description{margin-bottom:32px}
+    .description h3{font-size:1.1rem;color:var(--navy);margin-bottom:12px}
+    .description p{color:var(--gray);line-height:1.8;margin-bottom:12px}
+
+    .features-list{display:flex;flex-direction:column;gap:10px;margin-bottom:32px}
+    .features-list li{display:flex;align-items:center;gap:10px;color:var(--gray);font-size:.9rem}
+    .features-list li::before{content:'✓';color:var(--success);font-weight:700}
+
+    .actions{display:flex;flex-direction:column;gap:12px;margin-bottom:32px}
+    .btn-action{padding:14px 24px;border-radius:var(--r);font-weight:600;font-size:.95rem;text-decoration:none;border:none;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:10px}
+    .btn-primary{background:linear-gradient(135deg,var(--blue),var(--blue-dk));color:white;box-shadow:0 8px 24px rgba(24,88,200,.3);position:relative;overflow:hidden}
+    .btn-primary::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:rgba(255,255,255,.15);transition:left .3s}
+    .btn-primary:hover::before{left:100%}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(24,88,200,.4)}
+    .btn-secondary{background:var(--cream);color:var(--navy);border:2px solid var(--gray-lt);transition:all .3s}
+    .btn-secondary:hover{border-color:var(--blue);background:rgba(24,88,200,.08);transform:translateY(-1px)}
+
+    .extras{background:var(--cream);padding:20px;border-radius:var(--r);margin-bottom:24px}
+    .extras h4{font-size:.9rem;color:var(--navy);margin-bottom:12px;font-weight:700}
+    .extra-item{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:.85rem;color:var(--gray)}
+    .extra-item::before{content:'';width:4px;height:4px;background:var(--gold);border-radius:50%;flex-shrink:0}
+
+    /* TABS */
+    .tabs{margin-top:60px;border-top:1px solid var(--gray-lt);padding-top:40px}
+    .tab-nav{display:flex;gap:0;border-bottom:2px solid var(--gray-lt);margin-bottom:32px}
+    .tab-btn{background:none;border:none;padding:14px 24px;font-size:.95rem;font-weight:600;color:var(--gray);cursor:pointer;transition:all .3s;border-bottom:3px solid transparent;margin-bottom:-2px;position:relative}
+    .tab-btn:hover{color:var(--navy)}
+    .tab-btn.active{color:var(--navy);border-bottom-color:var(--blue);font-weight:700}
+    .tab-btn.active::after{content:'';position:absolute;bottom:-5px;left:24px;right:24px;height:2px;background:linear-gradient(90deg,transparent,var(--blue),transparent);animation:fadeIn .3s ease-out}
+    .tab-content{display:none;animation:fadeIn .3s ease-out}
+    .tab-content.active{display:block}
+
+    /* RELATED */
+    .related{margin-top:80px;padding-top:60px;border-top:1px solid var(--gray-lt)}
+    .related h2{font-size:1.8rem;color:var(--navy);margin-bottom:40px}
+    .related-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+    .related-card{background:white;border:1px solid var(--gray-lt);border-radius:var(--r);overflow:hidden;transition:all .3s;position:relative}
+    .related-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--gold));transform:scaleX(0);transform-origin:left;transition:transform .3s;z-index:1}
+    .related-card:hover{transform:translateY(-6px);box-shadow:0 12px 32px rgba(3,13,31,.15);border-color:var(--blue)}
+    .related-card:hover::before{transform:scaleX(1)}
+    .related-image{height:200px;background:linear-gradient(135deg,var(--cream),rgba(24,88,200,.05));display:flex;align-items:center;justify-content:center}
+    .related-body{padding:20px}
+    .related-body p{font-size:.8rem;color:var(--gray);margin-bottom:6px}
+    .related-body h4{font-size:.95rem;color:var(--navy);margin-bottom:10px;font-weight:600}
+    .related-price{font-weight:700;color:var(--navy);margin-bottom:12px}
+    .related-link{color:var(--blue);text-decoration:none;font-size:.85rem;font-weight:600}
+
+    /* FOOTER */
+    #footer{background:linear-gradient(180deg,var(--navy),#000814);color:white;padding:60px 32px 30px;margin-top:80px}
+    .footer-inner{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:48px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .footer-col h4{font-size:.75rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:20px}
+    .footer-col a{display:block;margin-bottom:10px;color:rgba(255,255,255,.6);text-decoration:none;font-size:.85rem;transition:all .2s}
+    .footer-col a:hover{color:var(--gold);transform:translateX(4px)}
+    .footer-bottom{display:flex;justify-content:space-between;max-width:1400px;margin:0 auto;padding-top:20px;font-size:.75rem;color:rgba(255,255,255,.35)}
+
+    /* ANIMATIONS */
+    @keyframes slideInLeft{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+    @keyframes slideInRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    .gallery{animation:slideInLeft .6s ease-out}
+    .product-info{animation:slideInRight .6s ease-out}
+
+    /* RESPONSIVE */
+    @media(max-width:1024px){
+      .product-detail{grid-template-columns:1fr;gap:40px;padding:40px 24px}
+      .related-grid{grid-template-columns:repeat(2,1fr)}
+      .product-info h1{font-size:1.8rem}
+    }
+    @media(max-width:768px){
+      #header{padding:14px 16px;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+      .header-inner{flex-direction:column;gap:12px}
+      .btn-back{width:100%;text-align:center}
+      .breadcrumb{padding:12px 16px;font-size:.8rem;border-bottom:1px solid rgba(196,163,90,.08)}
+      .product-detail{grid-template-columns:1fr;gap:24px;padding:24px 16px}
+      .product-info h1{font-size:1.4rem;margin-bottom:6px}
+      .product-info .brand{font-size:.75rem}
+      .product-price{flex-direction:column;gap:8px;margin-bottom:20px}
+      .current{font-size:1.8rem}
+      .original{font-size:.9rem}
+      .specs{margin-bottom:20px;padding-bottom:20px}
+      .spec-row{padding:10px 0;font-size:.85rem}
+      .description h3{font-size:1rem}
+      .description p{font-size:.85rem}
+      .features-list li{font-size:.85rem}
+      .actions{flex-direction:column}
+      .btn-action{padding:12px 16px;font-size:.9rem}
+      .extras{padding:16px}
+      .tabs{margin-top:40px;padding-top:24px}
+      .tab-btn{padding:12px 16px;font-size:.9rem}
+      .related{margin-top:40px;padding-top:24px}
+      .related h2{font-size:1.4rem;margin-bottom:24px}
+      .related-grid{grid-template-columns:1fr}
+      .gallery-main{aspect-ratio:1}
+      .gallery-thumbs{gap:8px}
+      .thumb{width:60px;height:60px;font-size:.7rem}
+      .footer-inner{grid-template-columns:repeat(2,1fr);gap:24px;padding-bottom:30px}
+      .footer-col h4{font-size:.7rem;margin-bottom:12px}
+      .footer-col a{font-size:.8rem;margin-bottom:8px}
+      .footer-bottom{flex-direction:column;text-align:center;gap:8px;font-size:.7rem}
+    }
+    @media(max-width:480px){
+      #header{padding:10px 12px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+      .logo-svg{width:36px;height:36px}
+      .logo-text span:first-child{font-size:.9rem}
+      .logo-text span:last-child{font-size:.5rem}
+      .btn-back{padding:8px 12px;font-size:.75rem}
+      .breadcrumb{padding:10px 12px;font-size:.7rem}
+      .breadcrumb a{font-size:.7rem}
+      .breadcrumb span{margin:0 4px}
+      .product-detail{grid-template-columns:1fr;gap:16px;padding:16px 12px}
+      .product-info h1{font-size:1.2rem}
+      .product-info .brand{font-size:.7rem}
+      .rating{flex-direction:column;gap:8px;margin-bottom:16px}
+      .stars{gap:2px}
+      .stars svg{width:14px;height:14px}
+      .rating-count{font-size:.8rem}
+      .product-price{flex-direction:row;align-items:center;gap:6px;margin-bottom:16px}
+      .current{font-size:1.5rem}
+      .original{font-size:.8rem}
+      .discount{font-size:.7rem;padding:3px 6px}
+      .specs{margin-bottom:16px;padding-bottom:16px}
+      .spec-row{padding:8px 0;font-size:.8rem}
+      .description{margin-bottom:16px}
+      .description h3{font-size:.95rem;margin-bottom:8px}
+      .description p{font-size:.8rem;margin-bottom:8px}
+      .features-list{margin-bottom:16px;gap:8px}
+      .features-list li{font-size:.8rem}
+      .actions{gap:8px;margin-bottom:16px}
+      .btn-action{padding:10px 12px;font-size:.8rem;gap:6px}
+      .btn-action svg{width:14px;height:14px}
+      .extras{padding:12px}
+      .extras h4{font-size:.85rem;margin-bottom:8px}
+      .extra-item{font-size:.8rem;margin-bottom:6px;gap:6px}
+      .tabs{margin-top:24px;padding-top:16px}
+      .tab-nav{margin-bottom:16px;gap:0}
+      .tab-btn{padding:10px 12px;font-size:.8rem}
+      .tab-content table{font-size:.8rem}
+      .tab-content table td{padding:8px 0}
+      .related{margin-top:24px;padding-top:16px}
+      .related h2{font-size:1.2rem;margin-bottom:16px}
+      .related-grid{grid-template-columns:1fr;gap:12px}
+      .related-image{height:140px}
+      .related-body{padding:12px}
+      .related-body p{font-size:.75rem}
+      .related-body h4{font-size:.9rem;margin-bottom:6px}
+      .related-price{font-size:.95rem;margin-bottom:8px}
+      .related-link{font-size:.8rem}
+      .gallery{margin-bottom:16px}
+      .gallery-main{margin-bottom:12px}
+      .gallery-thumbs{gap:6px}
+      .thumb{width:50px;height:50px}
+    }
+  </style>
+</head>
+<body>
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <a href="loja.html">Loja</a> <span>/</span> <a href="loja.html#armacoes">Armações</a> <span>/</span> <span>Ray-Ban RB5154 Clubmaster</span>
+  </div>
+
+  <!-- HEADER -->
+  <header id="header">
+    <div class="header-inner">
+      <a href="loja.html" class="logo">
+        <svg class="logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="48" fill="#1858C8"/>
+          <circle cx="50" cy="50" r="38" stroke="white" stroke-width="2.5" fill="none" stroke-dasharray="5 4"/>
+          <circle cx="50" cy="50" r="29" stroke="white" stroke-width="2.5" fill="none" stroke-dasharray="4 3"/>
+          <circle cx="50" cy="50" r="20" stroke="white" stroke-width="2.5" fill="none"/>
+          <circle cx="50" cy="50" r="11" fill="white"/>
+          <circle cx="50" cy="50" r="6" fill="#1858C8"/>
+          <circle cx="53" cy="47" r="2.5" fill="white"/>
+          <path d="M14 50 Q20 44 26 50" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M74 50 Q80 44 86 50" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        </svg>
+        <div class="logo-text">
+          <span>Visiomais</span>
+          <span>Óptica</span>
+        </div>
+      </a>
+      <a href="loja.html" class="btn-back">← Voltar para Loja</a>
+    </div>
+  </header>
+
+  <!-- PRODUCT DETAIL -->
+  <div class="product-detail">
+    <!-- GALLERY -->
+    <div class="gallery">
+      <div class="gallery-main">
+        <svg viewBox="0 0 280 120" fill="none"><rect x="10" y="18" width="110" height="80" rx="24" stroke="#1858C8" stroke-width="7" fill="rgba(24,88,200,0.07)"/><rect x="160" y="18" width="110" height="80" rx="24" stroke="#1858C8" stroke-width="7" fill="rgba(24,88,200,0.07)"/><path d="M120 58 C126 50 134 46 140 46 C146 46 154 50 160 58" stroke="#1858C8" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M10 38 L0 30" stroke="#1858C8" stroke-width="7" stroke-linecap="round"/><path d="M270 38 L280 30" stroke="#1858C8" stroke-width="7" stroke-linecap="round"/></svg>
+      </div>
+      <div class="gallery-thumbs">
+        <div class="thumb active"></div>
+        <div class="thumb"></div>
+        <div class="thumb"></div>
+        <div class="thumb"></div>
+      </div>
+    </div>
+
+    <!-- INFO -->
+    <div>
+      <div class="product-info">
+        <div class="brand">Ray-Ban</div>
+        <h1>RB5154 Clubmaster</h1>
+
+        <div class="rating">
+          <div class="stars">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <span class="rating-count">142 avaliações • 4.9★</span>
+        </div>
+
+        <div class="product-price">
+          <span class="original">R$ 799</span>
+          <span class="current">R$ 599</span>
+          <span class="discount">25% OFF</span>
+        </div>
+
+        <div class="specs">
+          <div class="spec-row">
+            <strong>Material</strong>
+            <span>Acetato Premium</span>
+          </div>
+          <div class="spec-row">
+            <strong>Formato</strong>
+            <span>Clubmaster</span>
+          </div>
+          <div class="spec-row">
+            <strong>Público</strong>
+            <span>Unissex</span>
+          </div>
+          <div class="spec-row">
+            <strong>Origem</strong>
+            <span>Importado</span>
+          </div>
+          <div class="spec-row">
+            <strong>Compatibilidade</strong>
+            <span>Todos os tipos de lente</span>
+          </div>
+        </div>
+
+        <div class="description">
+          <h3>Sobre o Produto</h3>
+          <p>A clássica armação Ray-Ban RB5154 Clubmaster é um ícone do design de moda que combina o estilo vintage com a modernidade. Feita em acetato de alta qualidade, oferece conforto e durabilidade excepcionais para uso prolongado.</p>
+          <p>Este modelo é um bestseller mundial, apreciado por profissionais, artistas e personalidades. A silhueta característica traz sofisticação a qualquer rosto, funcionando tanto para uso profissional quanto casual. Seus contornos marcados e proporções clássicas criam uma presença forte e memorável.</p>
+          <p>Perfeita para quem busca um óculos versátil que funciona em diversos contextos e tipos de rosto. A Ray-Ban é uma marca sinônimo de qualidade, conforto e estilo permanente.</p>
+        </div>
+
+        <ul class="features-list">
+          <li>Acetato premium de alta qualidade com acabamento suave</li>
+          <li>Ponte ajustável para máximo conforto e personalização</li>
+          <li>Compatível com todos os tipos de lente (grau, multifocal, progressiva)</li>
+          <li>Proteção UV integrada na armação</li>
+          <li>Garantia de 2 anos contra defeitos de fabricação</li>
+          <li>Acompanha estojo protetor e pano de microfibra</li>
+        </ul>
+
+        <div class="actions">
+          <button class="btn-action btn-primary" onclick="location.href='https://wa.me/5543988401870?text=Olá! Interesse na Ray-Ban RB5154 Clubmaster.'">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Comprar via WhatsApp
+          </button>
+          <button class="btn-action btn-secondary" onclick="alert('Adicionado aos favoritos!')">
+            ♡ Adicionar aos Favoritos
+          </button>
+        </div>
+
+        <div class="extras">
+          <h4>✓ Informações Adicionais</h4>
+          <div class="extra-item">Frete grátis para Londrina em compras acima de R$ 200</div>
+          <div class="extra-item">Garantia de 30 dias para adaptação sem custo</div>
+          <div class="extra-item">Lentes de alta qualidade disponíveis para este modelo</div>
+          <div class="extra-item">Consultoria gratuita de estilo presencial ou remota</div>
+          <div class="extra-item">Serviço especializado Varilux disponível</div>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="tabs">
+        <div class="tab-nav">
+          <button class="tab-btn active" onclick="openTab(event, 'detalhes')">Detalhes Técnicos</button>
+          <button class="tab-btn" onclick="openTab(event, 'avaliacao')">Avaliações</button>
+          <button class="tab-btn" onclick="openTab(event, 'envio')">Envio e Devolução</button>
+        </div>
+
+        <div id="detalhes" class="tab-content active">
+          <h3 style="margin-bottom:16px;color:var(--navy)">Especificações Completas</h3>
+          <table style="width:100%;border-collapse:collapse">
+            <tr style="border-bottom:1px solid var(--gray-lt)">
+              <td style="padding:12px 0;font-weight:600;color:var(--navy);width:40%">Marca</td>
+              <td style="padding:12px 0;color:var(--gray)">Ray-Ban</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--gray-lt)">
+              <td style="padding:12px 0;font-weight:600;color:var(--navy)">Modelo</td>
+              <td style="padding:12px 0;color:var(--gray)">RB5154 Clubmaster</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--gray-lt)">
+              <td style="padding:12px 0;font-weight:600;color:var(--navy)">Material</td>
+              <td style="padding:12px 0;color:var(--gray)">Acetato Premium</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--gray-lt)">
+              <td style="padding:12px 0;font-weight:600;color:var(--navy)">Cor</td>
+              <td style="padding:12px 0;color:var(--gray)">Tartaruga Escura</td>
+            </tr>
+            <tr>
+              <td style="padding:12px 0;font-weight:600;color:var(--navy)">Garantia</td>
+              <td style="padding:12px 0;color:var(--gray)">2 anos contra defeitos de fabricação</td>
+            </tr>
+          </table>
+        </div>
+
+        <div id="avaliacao" class="tab-content">
+          <h3 style="margin-bottom:24px;color:var(--navy)">Avaliações de Clientes</h3>
+          <div style="background:var(--cream);padding:20px;border-radius:var(--r);margin-bottom:20px">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+              <div style="background:linear-gradient(135deg,var(--blue),var(--blue-dk));color:white;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700">MR</div>
+              <div>
+                <div style="font-weight:600;color:var(--navy)">Maria Silva</div>
+                <div style="font-size:.8rem;color:var(--gray)">Comprado em Fevereiro de 2026</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:3px;margin-bottom:10px">
+              <svg style="width:16px;height:16px;color:var(--gold);fill:currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg style="width:16px;height:16px;color:var(--gold);fill:currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg style="width:16px;height:16px;color:var(--gold);fill:currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg style="width:16px;height:16px;color:var(--gold);fill:currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg style="width:16px;height:16px;color:var(--gold);fill:currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <p style="color:var(--gray);line-height:1.6">"Adorei! Armação muito confortável e de excelente qualidade. Chegou em perfeito estado e o atendimento da Visiomais foi impecável. Recomendo!"</p>
+          </div>
+        </div>
+
+        <div id="envio" class="tab-content">
+          <h3 style="margin-bottom:16px;color:var(--navy)">Frete e Entrega</h3>
+          <p style="margin-bottom:12px;color:var(--gray)"><strong>Londrina:</strong> Frete grátis em compras acima de R$ 200. Entrega em 2-3 dias úteis.</p>
+          <p style="margin-bottom:12px;color:var(--gray)"><strong>Outras regiões do Paraná:</strong> Consulte valor. Prazo de 3-5 dias úteis.</p>
+          <p style="margin-bottom:12px;color:var(--gray)"><strong>Demais regiões do Brasil:</strong> Entrega via transportadora. Consulte prazo e valor.</p>
+          <p style="margin-bottom:24px;color:var(--gray)">Você pode acompanhar sua entrega em tempo real através do código de rastreamento que enviaremos via WhatsApp.</p>
+
+          <h3 style="margin:24px 0 16px;color:var(--navy)">Política de Devolução e Trocas</h3>
+          <p style="margin-bottom:12px;color:var(--gray)">Você tem <strong>30 dias</strong> após o recebimento para devolver ou trocar o produto caso não se adapte. Nós facilitamos o processo:</p>
+          <ul style="margin-left:20px;margin-bottom:12px;color:var(--gray);line-height:1.8">
+            <li style="margin-bottom:6px">Envie uma mensagem via WhatsApp informando o motivo</li>
+            <li style="margin-bottom:6px">Geramos um código de devolução e orientações de envio</li>
+            <li style="margin-bottom:6px">Reembolsamos o valor integral após recebimento</li>
+            <li>Sem burocracia ou taxas adicionais</li>
+          </ul>
+          <p style="color:var(--gray)"><strong>Garantia:</strong> 2 anos contra defeitos de fabricação. Cobre problemas estruturais, não desgaste normal.</p>
+        </div>
+      </div>
+
+      <!-- RELATED -->
+      <div class="related">
+        <h2>Produtos Relacionados</h2>
+        <div class="related-grid">
+          <div class="related-card">
+            <div class="related-image">
+              <svg viewBox="0 0 280 120" fill="none"><rect x="10" y="18" width="110" height="80" rx="14" stroke="#833ab4" stroke-width="7" fill="rgba(131,58,180,0.07)"/><rect x="160" y="18" width="110" height="80" rx="14" stroke="#833ab4" stroke-width="7" fill="rgba(131,58,180,0.07)"/><path d="M120 58 C126 50 134 46 140 46 C146 46 154 50 160 58" stroke="#833ab4" stroke-width="7" fill="none" stroke-linecap="round"/></svg>
+            </div>
+            <div class="related-body">
+              <p>Prada</p>
+              <h4>PR 09WV</h4>
+              <div class="related-price">R$ 890</div>
+              <a href="produto.html?id=2" class="related-link">Ver Detalhes →</a>
+            </div>
+          </div>
+
+          <div class="related-card">
+            <div class="related-image">
+              <svg viewBox="0 0 280 120" fill="none"><rect x="10" y="18" width="110" height="80" rx="10" stroke="#b8860b" stroke-width="7" fill="rgba(184,134,11,0.07)"/><rect x="160" y="18" width="110" height="80" rx="10" stroke="#b8860b" stroke-width="7" fill="rgba(184,134,11,0.07)"/><path d="M120 58 C126 50 134 46 140 46 C146 46 154 50 160 58" stroke="#b8860b" stroke-width="7" fill="none" stroke-linecap="round"/></svg>
+            </div>
+            <div class="related-body">
+              <p>Michael Kors</p>
+              <h4>MK3048 Chelsea</h4>
+              <div class="related-price">R$ 620</div>
+              <a href="produto.html?id=3" class="related-link">Ver Detalhes →</a>
+            </div>
+          </div>
+
+          <div class="related-card">
+            <div class="related-image">
+              <svg viewBox="0 0 280 120" fill="none"><rect x="10" y="18" width="110" height="80" rx="30" stroke="#cc2222" stroke-width="7" fill="rgba(204,34,34,0.06)"/><rect x="160" y="18" width="110" height="80" rx="30" stroke="#cc2222" stroke-width="7" fill="rgba(204,34,34,0.06)"/><path d="M120 58 C126 50 134 46 140 46 C146 46 154 50 160 58" stroke="#cc2222" stroke-width="7" fill="none" stroke-linecap="round"/></svg>
+            </div>
+            <div class="related-body">
+              <p>Tommy Hilfiger</p>
+              <h4>TH1810</h4>
+              <div class="related-price">R$ 380</div>
+              <a href="produto.html?id=4" class="related-link">Ver Detalhes →</a>
+            </div>
+          </div>
+
+          <div class="related-card">
+            <div class="related-image">
+              <svg viewBox="0 0 280 120" fill="none"><rect x="10" y="18" width="110" height="80" rx="24" stroke="#1858C8" stroke-width="7" fill="rgba(24,88,200,0.07)"/><rect x="160" y="18" width="110" height="80" rx="24" stroke="#1858C8" stroke-width="7" fill="rgba(24,88,200,0.07)"/><path d="M120 58 C126 50 134 46 140 46 C146 46 154 50 160 58" stroke="#1858C8" stroke-width="7" fill="none" stroke-linecap="round"/></svg>
+            </div>
+            <div class="related-body">
+              <p>Oakley</p>
+              <h4>OX8046 Airdrop</h4>
+              <div class="related-price">R$ 489</div>
+              <a href="produto.html?id=5" class="related-link">Ver Detalhes →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer id="footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h4>Sobre Visiomais</h4>
+        <a href="#">Quem Somos</a>
+        <a href="#">Nossa História</a>
+        <a href="#">Certificações</a>
+        <a href="#">Blog</a>
+      </div>
+      <div class="footer-col">
+        <h4>Produtos</h4>
+        <a href="loja.html#armacoes">Armações</a>
+        <a href="#">Lentes de Grau</a>
+        <a href="#">Óculos de Sol</a>
+        <a href="#">Lentes de Contato</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contato</h4>
+        <a href="tel:5543988401870">(43) 98840-1870</a>
+        <a href="https://wa.me/5543988401870" target="_blank">WhatsApp</a>
+        <a href="#">Nossas Lojas</a>
+        <a href="#">Horário de Funcionamento</a>
+      </div>
+      <div class="footer-col">
+        <h4>Informações</h4>
+        <a href="#">Política de Privacidade</a>
+        <a href="#">Termos de Serviço</a>
+        <a href="#">Frete e Entrega</a>
+        <a href="#">Trocas e Devoluções</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>&copy; 2026 Óptica Visiomais. Todos os direitos reservados.</div>
+      <div>Desenvolvido com ❤ para sua melhor visão</div>
+    </div>
+  </footer>
+
+  <script>
+    function openTab(evt, tabName) {
+      const contents = document.querySelectorAll('.tab-content');
+      contents.forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+      document.getElementById(tabName).classList.add('active');
+      evt.currentTarget.classList.add('active');
+    }
+  </script>
+</body>
+</html>

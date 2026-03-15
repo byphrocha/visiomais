@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Loja Online — Óptica Visiomais | Armações, Lentes e Óculos de Sol</title>
+  <meta name="description" content="Compre armações premium, lentes de grau e óculos de sol na Óptica Visiomais. Varilux Especialista. Frete grátis para Londrina."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --navy:#030d1f;--navy-mid:#081a38;--blue:#1858C8;--blue-dk:#0f3d91;--blue-lt:#2a6edf;
+      --mist:#c8d9ff;--gold:#c4a35a;--cream:#f7f4ef;--white:#fff;
+      --gray:#64748b;--gray-lt:#e8ecf4;--success:#10b981;
+      --font-d:'Cormorant Garamond',Georgia,serif;--font-b:'DM Sans',system-ui,sans-serif;
+      --r:12px;--sh:0 8px 24px rgba(3,13,31,.08);--sh-lg:0 20px 48px rgba(3,13,31,.15)
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font-b);background:var(--white);color:#1e293b;line-height:1.6;overflow-x:hidden}
+    ::-webkit-scrollbar{width:6px}
+    ::-webkit-scrollbar-track{background:var(--navy)}
+    ::-webkit-scrollbar-thumb{background:var(--blue);border-radius:3px}
+    h1,h2,h3,h4{font-family:var(--font-d);line-height:1.15}
+
+    /* HEADER */
+    #header{position:sticky;top:0;z-index:100;background:linear-gradient(180deg,var(--navy) 0%,rgba(3,13,31,.98) 100%);border-bottom:1px solid rgba(196,163,90,.15);padding:18px 32px;backdrop-filter:blur(8px);box-shadow:0 4px 20px rgba(0,0,0,.3)}
+    .header-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:32px}
+    .logo{display:flex;align-items:center;gap:14px;text-decoration:none;transition:all .3s;position:relative}
+    .logo:hover{opacity:.85}
+    .logo-svg{width:52px;height:52px;flex-shrink:0;transition:transform .3s cubic-bezier(.2,.8,.3,1)}
+    .logo:hover .logo-svg{transform:scale(1.05)}
+    .logo-text{display:flex;flex-direction:column;gap:2px}
+    .logo-text span:first-child{font-family:var(--font-d);font-size:1.15rem;font-weight:700;color:white;letter-spacing:.02em;text-transform:uppercase;background:linear-gradient(135deg,white,rgba(255,255,255,.9));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .logo-text span:last-child{font-size:.65rem;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;font-weight:700;tracking-tracking:.05em}
+
+    .search-box{flex:1;max-width:460px;position:relative}
+    .search-box input{width:100%;padding:12px 18px 12px 44px;border:2px solid rgba(196,163,90,.2);border-radius:var(--r);background:rgba(255,255,255,.08);color:white;font-family:var(--font-b);font-size:.9rem;outline:none;transition:all .35s cubic-bezier(.2,.8,.3,1);backdrop-filter:blur(4px)}
+    .search-box input::placeholder{color:rgba(255,255,255,.45);font-weight:400}
+    .search-box input:focus{border-color:var(--gold);background:rgba(255,255,255,.15);box-shadow:0 0 0 4px rgba(196,163,90,.2);text-shadow:0 0 20px rgba(196,163,90,.1)}
+    .search-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:rgba(196,163,90,.6);pointer-events:none;transition:color .3s}
+    .search-box input:focus ~ .search-icon{color:var(--gold)}
+
+    .header-actions{display:flex;gap:14px;align-items:center}
+    .btn-header{display:inline-flex;align-items:center;gap:8px;padding:11px 24px;border-radius:var(--r);font-weight:700;font-size:.85rem;text-decoration:none;transition:all .3s cubic-bezier(.2,.8,.3,1);white-space:nowrap;border:none;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;position:relative;overflow:hidden}
+    .btn-header::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.1);transform:translateX(-100%);transition:transform .3s cubic-bezier(.2,.8,.3,1)}
+    .btn-header:hover::before{transform:translateX(100%)}
+    .btn-wpp{background:linear-gradient(135deg,var(--success),#059669);color:white;box-shadow:0 4px 16px rgba(16,185,129,.3)}
+    .btn-wpp:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(16,185,129,.4)}
+    .btn-back{background:rgba(255,255,255,.12);color:white;border:2px solid rgba(255,255,255,.2);backdrop-filter:blur(4px)}
+    .btn-back:hover{background:rgba(255,255,255,.18);border-color:var(--gold);color:var(--gold);box-shadow:0 0 16px rgba(196,163,90,.25)}
+
+    /* NAV */
+    .category-nav{background:linear-gradient(90deg,var(--navy) 0%,rgba(3,13,31,.97) 100%);border-bottom:1px solid rgba(196,163,90,.12);overflow-x:auto;scrollbar-width:none;backdrop-filter:blur(2px)}
+    .category-nav::-webkit-scrollbar{display:none}
+    .nav-inner{display:flex;gap:0;padding:0 32px;max-width:1400px;margin:0 auto}
+    .nav-item{display:flex;align-items:center;gap:8px;padding:16px 22px;color:rgba(255,255,255,.55);text-decoration:none;font-size:.9rem;font-weight:600;letter-spacing:.03em;text-transform:capitalize;border-bottom:3px solid transparent;transition:all .35s cubic-bezier(.2,.8,.3,1);white-space:nowrap;flex-shrink:0;cursor:pointer;position:relative;text-shadow:0 1px 3px rgba(0,0,0,.2)}
+    .nav-item:hover{color:rgba(255,255,255,.95)}
+    .nav-item::before{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),transparent);transform:scaleX(0);transform-origin:left;transition:transform .35s cubic-bezier(.2,.8,.3,1)}
+    .nav-item:hover::before{transform:scaleX(1)}
+    .nav-item.active{color:white;border-bottom-color:var(--gold);font-weight:700}
+    .nav-item.active::before{transform:scaleX(1)}
+    .nav-item.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),transparent)}
+    .nav-item svg{width:18px;height:18px;stroke-width:2;transition:filter .3s;filter:drop-shadow(0 0 2px rgba(196,163,90,.3))}
+    .nav-item:hover svg{filter:drop-shadow(0 0 4px rgba(196,163,90,.6))}
+
+    /* HERO SECTION */
+    .hero{background:linear-gradient(135deg,#030d1f 0%,#081a38 50%,#1858C8 100%);color:white;padding:120px 32px 100px;text-align:center;position:relative;overflow:hidden}
+    .hero::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;opacity:.03;background:url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="white" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');z-index:0}
+    .hero-inner{position:relative;z-index:1;max-width:1400px;margin:0 auto}
+    .hero h1{font-size:3.6rem;margin-bottom:20px;font-weight:700;letter-spacing:-.03em}
+    .hero p{font-size:1.3rem;margin-bottom:40px;opacity:.9;font-weight:300;letter-spacing:.01em;max-width:700px;margin-left:auto;margin-right:auto}
+    .hero-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+    .btn-hero{padding:16px 40px;border-radius:var(--r);font-weight:600;text-decoration:none;border:none;cursor:pointer;transition:all .3s;font-size:1rem;letter-spacing:.02em;text-transform:uppercase}
+    .btn-hero.primary{background:white;color:var(--blue);box-shadow:0 12px 32px rgba(0,0,0,.2)}
+    .btn-hero.primary:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.25)}
+    .btn-hero.secondary{background:rgba(255,255,255,.15);color:white;border:2px solid white}
+    .btn-hero.secondary:hover{background:rgba(255,255,255,.25);backdrop-filter:blur(8px);transform:translateY(-4px)}
+
+    /* LANDING SECTIONS */
+    .landing-section{max-width:1400px;margin:0 auto;padding:100px 32px}
+    .section-header{margin-bottom:56px;text-align:center}
+    .section-header h2{font-size:2.8rem;color:var(--navy);margin-bottom:16px;font-weight:700;letter-spacing:-.02em;font-family:var(--font-d)}
+    .section-header p{font-size:1.05rem;color:var(--gray);max-width:700px;margin:0 auto;font-weight:400;line-height:1.7}
+
+    /* OFERTAS SECTION */
+    .ofertas-section{background:linear-gradient(180deg,rgba(24,88,200,.03),rgba(196,163,90,.02))}
+    .ofertas-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+    .oferta-card{background:white;border-radius:var(--r);overflow:hidden;border:2px solid #e8ecf4;transition:all .4s cubic-bezier(.2,.8,.3,1);position:relative;cursor:pointer}
+    .oferta-card:hover{transform:translateY(-16px);box-shadow:0 32px 64px rgba(3,13,31,.25);border-color:var(--gold)}
+    .oferta-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--gold),#f4a460);transform:scaleX(0);transform-origin:left;transition:transform .4s ease-out;z-index:1}
+    .oferta-card:hover::before{transform:scaleX(1)}
+    .oferta-visual{height:260px;background:linear-gradient(135deg,var(--cream),rgba(196,163,90,.05));display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+    .oferta-visual::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 30% 30%,rgba(255,255,255,.4),transparent);pointer-events:none}
+    .oferta-visual svg{width:100%;height:100%;max-width:180px;max-height:180px;transition:transform .4s cubic-bezier(.2,.8,.3,1);object-fit:contain;position:relative;z-index:1}
+    .oferta-card:hover .oferta-visual svg{transform:scale(1.12)}
+    .desconto-badge{position:absolute;top:16px;right:16px;background:var(--gold);color:var(--navy);padding:12px 20px;border-radius:8px;font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;box-shadow:0 8px 20px rgba(196,163,90,.5);z-index:2;animation:badgePop .4s cubic-bezier(.2,.8,.3,1)}
+    @keyframes badgePop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+    .oferta-body{padding:24px}
+    .oferta-brand{font-size:.7rem;color:var(--blue);font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+    .oferta-name{font-size:1rem;font-weight:600;color:var(--navy);margin-bottom:6px;line-height:1.3}
+    .oferta-prices{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+    .oferta-old{font-size:.85rem;color:var(--gray);text-decoration:line-through;opacity:.7}
+    .oferta-new{font-size:1.3rem;font-weight:700;color:var(--navy)}
+    .oferta-cta{background:linear-gradient(135deg,var(--gold),#d4af37);color:var(--navy);padding:12px;border:none;border-radius:8px;font-weight:700;font-size:.9rem;width:100%;cursor:pointer;transition:all .3s;text-decoration:none;display:block;text-align:center;letter-spacing:.04em;text-transform:uppercase}
+    .oferta-cta:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(196,163,90,.5)}
+
+    /* FEATURED & NOVIDADES */
+    .produtos-destaque-section{background:white}
+    .novidades-section{background:linear-gradient(180deg,rgba(24,88,200,.02),rgba(196,163,90,.01))}
+
+    .product-showcase-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+    .showcase-card{background:white;border-radius:var(--r);overflow:hidden;border:2px solid #e8ecf4;transition:all .4s cubic-bezier(.2,.8,.3,1);position:relative;cursor:pointer}
+    .showcase-card:hover{transform:translateY(-16px);box-shadow:0 32px 64px rgba(3,13,31,.15);border-color:var(--blue)}
+    .showcase-badge{position:absolute;top:16px;left:16px;background:linear-gradient(135deg,var(--blue),var(--blue-dk));color:white;padding:8px 16px;border-radius:6px;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;z-index:2}
+    .showcase-visual{height:280px;background:linear-gradient(135deg,rgba(24,88,200,.06),rgba(196,163,90,.02));display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+    .showcase-visual::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 30% 30%,rgba(255,255,255,.5),transparent);pointer-events:none}
+    .showcase-visual svg{width:100%;height:100%;max-width:200px;max-height:200px;transition:transform .4s cubic-bezier(.2,.8,.3,1);object-fit:contain;position:relative;z-index:1}
+    .showcase-card:hover .showcase-visual svg{transform:scale(1.15)}
+    .showcase-body{padding:24px}
+    .showcase-brand{font-size:.7rem;color:var(--blue);font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+    .showcase-name{font-size:1.05rem;font-weight:700;color:var(--navy);margin-bottom:8px;line-height:1.3;font-family:var(--font-d)}
+    .showcase-desc{font-size:.85rem;color:var(--gray);margin-bottom:16px;min-height:40px;line-height:1.5}
+    .showcase-price{font-size:1.4rem;font-weight:700;color:var(--blue);margin-bottom:16px}
+    .showcase-cta{background:linear-gradient(135deg,var(--blue),var(--blue-dk));color:white;padding:11px;border:none;border-radius:8px;font-weight:700;font-size:.9rem;width:100%;cursor:pointer;transition:all .3s;text-decoration:none;display:block;text-align:center;letter-spacing:.04em;text-transform:uppercase;position:relative;overflow:hidden}
+    .showcase-cta::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:rgba(255,255,255,.15);transition:left .3s}
+    .showcase-cta:hover::before{left:100%}
+    .showcase-cta:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(24,88,200,.4)}
+
+    /* CTA SECTION */
+    .cta-explore{background:linear-gradient(135deg,var(--navy) 0%,var(--blue) 100%);color:white;padding:80px 32px;text-align:center;position:relative;overflow:hidden}
+    .cta-explore::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;opacity:.04;background:url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="white" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');z-index:0}
+    .cta-explore-inner{position:relative;z-index:1;max-width:800px;margin:0 auto}
+    .cta-explore h2{font-size:2.8rem;margin-bottom:20px;font-weight:700}
+    .cta-explore p{font-size:1.1rem;margin-bottom:40px;opacity:.9}
+    .btn-cta-primary{background:white;color:var(--blue);padding:14px 44px;border:none;border-radius:var(--r);font-weight:700;font-size:1rem;cursor:pointer;transition:all .3s;text-decoration:none;display:inline-block;letter-spacing:.02em;text-transform:uppercase}
+    .btn-cta-primary:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.3)}
+
+    /* MAIN CONTAINER */
+    .main-container{max-width:1400px;margin:0 auto;padding:40px 32px;display:grid;grid-template-columns:280px 1fr;gap:40px;display:none}
+    .main-container.active{display:grid}
+
+    /* FILTERS SIDEBAR */
+    .filters-sidebar{background:var(--cream);padding:24px;border-radius:var(--r);height:fit-content;position:sticky;top:100px}
+    .filter-section{margin-bottom:28px}
+    .filter-section:last-child{margin-bottom:0}
+    .filter-section h4{font-size:.85rem;font-weight:700;color:var(--navy);margin-bottom:16px;text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+    .filter-toggle{display:none;font-size:1.2rem;color:var(--blue)}
+    .filter-group{display:flex;flex-direction:column;gap:10px}
+    .filter-option{display:flex;align-items:center;gap:10px;cursor:pointer}
+    .filter-option input[type="checkbox"]{width:16px;height:16px;accent-color:var(--blue);cursor:pointer;flex-shrink:0}
+    .filter-option label{font-size:.85rem;color:var(--gray);cursor:pointer;flex:1}
+    .filter-option input:checked + label{color:var(--navy);font-weight:600}
+
+    .price-inputs{display:flex;gap:10px;margin-bottom:12px}
+    .price-inputs input{flex:1;padding:8px;border:1px solid var(--gray-lt);border-radius:6px;font-size:.8rem}
+
+    .color-picker{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .color-option{width:100%;aspect-ratio:1;border-radius:8px;border:3px solid transparent;cursor:pointer;transition:all .2s}
+    .color-option:hover{border-color:var(--blue)}
+    .color-option.selected{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold)}
+
+    .sort-select{width:100%;padding:10px;border:1px solid var(--gray-lt);border-radius:var(--r);font-size:.85rem;font-family:var(--font-b);color:var(--navy);background:white}
+
+    .btn-clear-filters{width:100%;padding:10px;background:rgba(24,88,200,.1);color:var(--blue);border:1px solid var(--blue);border-radius:var(--r);font-weight:600;cursor:pointer;transition:all .2s;font-size:.85rem}
+    .btn-clear-filters:hover{background:var(--blue);color:white;transform:translateY(-1px)}
+
+    /* PRODUCTS SECTION */
+    .products-section h2{font-size:2.2rem;color:var(--navy);margin-bottom:12px;font-weight:700;letter-spacing:-.02em}
+    .products-section p{color:var(--gray);margin-bottom:32px;font-size:.95rem;font-weight:500}
+
+    .product-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+    .product-card{background:white;border-radius:var(--r);overflow:hidden;border:2px solid var(--gray-lt);transition:all .3s cubic-bezier(.2,.8,.3,1);display:flex;flex-direction:column;cursor:pointer;position:relative}
+    .product-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--gold));transform:scaleX(0);transform-origin:left;transition:transform .35s}
+    .product-card:hover{transform:translateY(-12px);box-shadow:0 24px 48px rgba(3,13,31,.2);border-color:var(--blue)}
+    .product-card:hover::before{transform:scaleX(1)}
+    .product-visual{height:260px;background:linear-gradient(135deg,var(--cream),rgba(24,88,200,.05));display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+    .product-visual::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 30% 30%,rgba(255,255,255,.4),transparent);pointer-events:none}
+    .product-visual svg{width:100%;height:100%;max-width:200px;max-height:200px;transition:transform .35s;object-fit:contain;position:relative;z-index:1}
+    .product-card:hover .product-visual svg{transform:scale(1.08)}
+    .product-badge{position:absolute;top:12px;right:12px;background:var(--gold);color:var(--navy);padding:8px 16px;border-radius:8px;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 6px 16px rgba(196,163,90,.4);transform:scale(.9);transition:all .3s;z-index:2}
+    .product-card:hover .product-badge{transform:scale(1);box-shadow:0 8px 20px rgba(196,163,90,.5)}
+    .product-label{position:absolute;bottom:12px;left:12px;background:linear-gradient(135deg,rgba(24,88,200,.9),rgba(15,61,145,.9));color:white;padding:6px 14px;border-radius:8px;font-size:.7rem;font-weight:600;backdrop-filter:blur(4px);z-index:2}
+
+    .product-body{padding:24px;display:flex;flex-direction:column;flex:1}
+    .product-brand{font-size:.7rem;color:var(--blue);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+    .product-name{font-size:1.05rem;font-weight:600;color:var(--navy);margin-bottom:4px;line-height:1.3}
+    .product-desc{font-size:.8rem;color:var(--gray);margin-bottom:8px;min-height:40px}
+    .product-spec{font-size:.75rem;color:rgba(100,116,139,.7);margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em}
+    .product-price{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex:1;align-items:flex-end}
+    .price-old{font-size:.8rem;color:var(--gray);text-decoration:line-through}
+    .price-new{font-size:1.25rem;font-weight:700;color:var(--navy)}
+    .product-rating{display:flex;gap:3px;margin-bottom:14px}
+    .product-rating svg{width:14px;height:14px;color:var(--gold);fill:currentColor}
+
+    .product-cta{background:linear-gradient(135deg,var(--blue),var(--blue-dk));color:white;padding:11px;border:none;border-radius:8px;font-weight:600;font-size:.85rem;text-decoration:none;cursor:pointer;transition:all .3s;text-align:center;display:block;margin-top:auto;position:relative;overflow:hidden}
+    .product-cta::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:rgba(255,255,255,.2);transition:left .3s}
+    .product-cta:hover::before{left:100%}
+    .product-cta:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(24,88,200,.4)}
+
+    .no-results{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--gray)}
+
+    /* FOOTER */
+    #footer{background:linear-gradient(180deg,var(--navy),#000814);color:white;padding:60px 32px 30px;margin-top:80px}
+    .footer-inner{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:48px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .footer-col h4{font-size:.75rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:20px}
+    .footer-col a{display:block;margin-bottom:10px;color:rgba(255,255,255,.6);text-decoration:none;font-size:.85rem;transition:all .2s}
+    .footer-col a:hover{color:var(--gold);transform:translateX(4px)}
+    .footer-bottom{display:flex;justify-content:space-between;max-width:1400px;margin:0 auto;padding-top:20px;font-size:.75rem;color:rgba(255,255,255,.35)}
+
+    /* ANIMATIONS */
+    @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+
+    .oferta-card, .showcase-card{animation:fadeInUp .6s ease-out forwards;opacity:0}
+    .oferta-card:nth-child(1), .showcase-card:nth-child(1){animation-delay:.08s}
+    .oferta-card:nth-child(2), .showcase-card:nth-child(2){animation-delay:.16s}
+    .oferta-card:nth-child(3), .showcase-card:nth-child(3){animation-delay:.24s}
+    .oferta-card:nth-child(4), .showcase-card:nth-child(4){animation-delay:.32s}
+
+    .product-card{animation:fadeIn .6s ease-out forwards;opacity:0}
+    .product-card:nth-child(1){animation-delay:.05s}
+    .product-card:nth-child(2){animation-delay:.1s}
+    .product-card:nth-child(3){animation-delay:.15s}
+    .product-card:nth-child(4){animation-delay:.2s}
+    .product-card:nth-child(5){animation-delay:.25s}
+    .product-card:nth-child(6){animation-delay:.3s}
+    .product-card:nth-child(7){animation-delay:.35s}
+    .product-card:nth-child(8){animation-delay:.4s}
+
+    /* RESPONSIVE */
+    @media(max-width:1024px){
+      #header{padding:16px 24px}
+      .header-inner{gap:28px}
+      .search-box{max-width:380px}
+      .logo-svg{width:48px;height:48px}
+      .btn-header{padding:10px 20px;font-size:.8rem}
+      .main-container{grid-template-columns:180px 1fr;gap:24px;padding:32px 20px}
+      .product-grid{grid-template-columns:repeat(3,1fr);gap:16px}
+      .filters-sidebar{padding:16px;top:100px}
+      .hero{padding:80px 20px 60px}
+      .hero h1{font-size:2.8rem}
+      .hero p{font-size:1rem}
+      .landing-section{padding:60px 20px}
+      .section-header h2{font-size:2.2rem}
+      .ofertas-grid, .product-showcase-grid{grid-template-columns:repeat(3,1fr);gap:20px}
+      .oferta-card, .showcase-card{border-radius:10px}
+      .oferta-visual, .showcase-visual{height:220px}
+      .cta-explore{padding:60px 20px}
+      .cta-explore h2{font-size:2rem}
+    }
+    @media(max-width:768px){
+      #header{padding:14px 16px;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+      .header-inner{flex-wrap:wrap;gap:14px}
+      .logo-svg{width:46px;height:46px}
+      .logo-text span:first-child{font-size:1rem}
+      .search-box{flex:1;min-width:100%;max-width:100%;margin:0;order:3}
+      .search-box input{padding:11px 16px 11px 40px;font-size:.85rem}
+      .header-actions{gap:10px;width:100%;order:4;margin-top:8px;flex-wrap:wrap}
+      .btn-header{flex:1;font-size:.75rem;padding:10px 14px}
+      .category-nav{border-bottom:1px solid rgba(196,163,90,.1)}
+      .nav-item{padding:14px 18px;font-size:.85rem}
+      .nav-item svg{width:16px;height:16px}
+      .main-container{grid-template-columns:1fr;gap:16px;padding:20px 16px}
+      .filters-sidebar{position:static;background:white;padding:0;border:none;border-radius:0;margin:0 -16px;box-shadow:0 4px 12px rgba(0,0,0,.05)}
+      .filter-section{border-bottom:1px solid var(--gray-lt);padding:16px;margin:0}
+      .filter-section:last-child{border-bottom:none}
+      .filter-section h4{font-size:.8rem;margin-bottom:16px;cursor:pointer}
+      .filter-group,.price-inputs,.color-picker{max-height:0;overflow:hidden;transition:max-height .3s ease-in-out;opacity:0}
+      .filter-section.open .filter-group,.filter-section.open .price-inputs,.filter-section.open .color-picker{max-height:500px;opacity:1;display:flex;flex-direction:column;margin-bottom:12px}
+      .filter-section.open .filter-toggle{display:block}
+      .filter-toggle{color:var(--blue);font-weight:700}
+      .sort-select{width:100%;display:none}
+      .product-grid{grid-template-columns:repeat(2,1fr);gap:12px}
+      .product-card{border-radius:8px}
+      .product-visual{height:180px}
+      .product-body{padding:12px}
+      .product-name{font-size:.9rem}
+      .product-price{flex-direction:column;align-items:flex-start;gap:4px}
+      .product-cta{font-size:.8rem;padding:8px}
+      .products-section h2{font-size:1.4rem;margin-bottom:8px}
+      .products-section p{font-size:.85rem;margin-bottom:20px}
+      .footer-inner{grid-template-columns:repeat(2,1fr);gap:24px}
+      .footer-bottom{flex-direction:column;text-align:center;gap:10px;font-size:.65rem}
+      .hero{padding:40px 16px}
+      .hero h1{font-size:1.8rem}
+      .hero p{font-size:.95rem}
+      .hero-actions{gap:12px}
+      .btn-hero{padding:12px 24px;font-size:.9rem}
+      .landing-section{padding:40px 16px}
+      .section-header h2{font-size:1.8rem}
+      .section-header p{font-size:.95rem}
+      .ofertas-grid, .product-showcase-grid{grid-template-columns:repeat(2,1fr);gap:16px}
+      .oferta-card, .showcase-card{border-radius:10px}
+      .oferta-visual, .showcase-visual{height:200px}
+      .oferta-body, .showcase-body{padding:16px}
+      .cta-explore{padding:40px 16px}
+      .cta-explore h2{font-size:1.8rem}
+      .cta-explore p{font-size:1rem}
+    }
+    @media(max-width:480px){
+      #header{padding:12px;gap:0}
+      .header-inner{gap:10px}
+      .logo-svg{width:42px;height:42px}
+      .logo-text span:first-child{font-size:.95rem}
+      .logo-text span:last-child{font-size:.5rem}
+      .search-box{flex:1;max-width:100%}
+      .search-box input{font-size:.8rem;padding:10px 14px 10px 36px}
+      .search-icon{width:14px;height:14px;left:10px}
+      .btn-header{font-size:.65rem;padding:9px 12px;min-width:auto;gap:6px}
+      .category-nav{padding:0;border-top:1px solid rgba(196,163,90,.1)}
+      .nav-inner{padding:0;gap:0}
+      .nav-item{padding:13px 10px;font-size:.68rem;gap:4px;flex-shrink:0;letter-spacing:.02em}
+      .nav-item svg{width:14px;height:14px}
+      .main-container{padding:12px 12px}
+      .filters-sidebar{margin:0 -12px}
+      .filter-section{padding:12px}
+      .product-grid{grid-template-columns:1fr;gap:10px}
+      .product-visual{height:160px}
+      .product-body{padding:10px}
+      .product-brand{font-size:.65rem;margin-bottom:2px}
+      .product-name{font-size:.85rem;margin-bottom:2px}
+      .product-spec{font-size:.7rem;margin-bottom:6px}
+      .product-desc{font-size:.75rem;min-height:30px;margin-bottom:4px}
+      .price-old{font-size:.75rem}
+      .price-new{font-size:1rem}
+      .product-cta{font-size:.7rem;padding:6px}
+      .product-rating{margin-bottom:8px}
+      .product-rating svg{width:12px;height:12px}
+      .btn-clear-filters{font-size:.8rem;padding:8px}
+      .sort-select,.color-picker{display:none}
+      .filter-option label{font-size:.8rem}
+      .price-inputs{gap:6px}
+      .price-inputs input{font-size:.7rem;padding:6px}
+      .products-section h2{font-size:1.2rem;margin-bottom:6px}
+      .products-section p{font-size:.8rem;margin-bottom:16px}
+      .hero{padding:30px 12px;text-align:center}
+      .hero h1{font-size:1.5rem;margin-bottom:12px}
+      .hero p{font-size:.9rem;margin-bottom:20px}
+      .hero-actions{gap:8px;flex-direction:column}
+      .btn-hero{width:100%;padding:10px 16px;font-size:.85rem}
+      .landing-section{padding:30px 12px}
+      .section-header h2{font-size:1.5rem;margin-bottom:12px}
+      .section-header p{font-size:.85rem}
+      .ofertas-grid, .product-showcase-grid{grid-template-columns:1fr;gap:12px}
+      .oferta-card, .showcase-card{border-radius:8px}
+      .oferta-visual, .showcase-visual{height:160px}
+      .oferta-body, .showcase-body{padding:12px}
+      .oferta-brand, .showcase-brand{font-size:.65rem;margin-bottom:4px}
+      .oferta-name, .showcase-name{font-size:.9rem}
+      .oferta-prices, .showcase-price{font-size:.95rem}
+      .desconto-badge{padding:8px 12px;font-size:.65rem}
+      .showcase-badge{padding:6px 12px;font-size:.65rem}
+      .oferta-cta, .showcase-cta{font-size:.8rem;padding:10px}
+      .footer-inner{grid-template-columns:1fr;gap:16px;padding-bottom:20px}
+      .footer-col h4{font-size:.7rem;margin-bottom:10px}
+      .footer-col a{font-size:.7rem;margin-bottom:6px}
+      .footer-bottom{font-size:.6rem;gap:8px}
+      .product-badge{padding:4px 8px;font-size:.55rem}
+      .product-label{padding:3px 6px;font-size:.6rem}
+      .cta-explore{padding:30px 12px}
+      .cta-explore h2{font-size:1.5rem}
+      .cta-explore p{font-size:.9rem}
+      .btn-cta-primary{padding:11px 32px;font-size:.9rem}
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <header id="header">
+    <div class="header-inner">
+      <a href="loja.html" class="logo">
+        <svg class="logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="48" fill="#1858C8"/>
+          <circle cx="50" cy="50" r="38" stroke="white" stroke-width="2.5" fill="none" stroke-dasharray="5 4"/>
+          <circle cx="50" cy="50" r="29" stroke="white" stroke-width="2.5" fill="none" stroke-dasharray="4 3"/>
+          <circle cx="50" cy="50" r="20" stroke="white" stroke-width="2.5" fill="none"/>
+          <circle cx="50" cy="50" r="11" fill="white"/>
+          <circle cx="50" cy="50" r="6" fill="#1858C8"/>
+          <circle cx="53" cy="47" r="2.5" fill="white"/>
+          <path d="M14 50 Q20 44 26 50" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M74 50 Q80 44 86 50" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        </svg>
+        <div class="logo-text">
+          <span>Visiomais</span>
+          <span>Óptica</span>
+        </div>
+      </a>
+
+      <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Buscar armações, lentes..." id="searchInput" onkeyup="filterProducts()"/>
+      </div>
+
+      <div class="header-actions">
+        <a href="https://wa.me/5543988401870?text=Olá! Gostaria de fazer um pedido." class="btn-header btn-wpp" target="_blank">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp
+        </a>
+        <a href="index.html" class="btn-header btn-back">← Site</a>
+      </div>
+    </div>
+
+    <nav class="category-nav">
+      <div class="nav-inner">
+        <a class="nav-item" onclick="showHomepage()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M12 3v18M3 6h18M3 18h18"/></svg>
+          Início
+        </a>
+        <a class="nav-item active" onclick="showCategory('armacoes')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          Armações
+        </a>
+        <a class="nav-item" onclick="showCategory('lentes')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
+          Lentes
+        </a>
+        <a class="nav-item" onclick="showCategory('solar')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/></svg>
+          Óculos de Sol
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- LANDING PAGE - HOMEPAGE -->
+  <div id="homepage" class="homepage-wrapper">
+    <!-- HERO SECTION -->
+    <section class="hero">
+      <div class="hero-inner">
+        <h1>Sua Visão, Nossa Precisão</h1>
+        <p>Descubra óculos premium que combinam estilo, conforto e tecnologia de ponta. Varilux Especialista.</p>
+        <div class="hero-actions">
+          <a href="#" class="btn-hero primary" onclick="showCategory('armacoes');return false">Explorar Catálogo</a>
+          <a href="https://wa.me/5543988401870" target="_blank" class="btn-hero secondary">Consultoria Gratuita</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- OFERTAS IMPRESCINDÍVEIS -->
+    <section class="landing-section ofertas-section">
+      <div class="section-header">
+        <h2>Ofertas Imprescindíveis</h2>
+        <p>Descontos excepcionais em produtos premium selecionados para você.</p>
+      </div>
+      <div class="ofertas-grid" id="ofertasGrid"></div>
+    </section>
+
+    <!-- PRODUTOS EM DESTAQUE -->
+    <section class="landing-section produtos-destaque-section">
+      <div class="section-header">
+        <h2>Produtos em Destaque</h2>
+        <p>Bestsellers escolhidos pelos nossos clientes mais exigentes.</p>
+      </div>
+      <div class="product-showcase-grid" id="destaqueGrid"></div>
+    </section>
+
+    <!-- NOVIDADES & LANÇAMENTOS -->
+    <section class="landing-section novidades-section">
+      <div class="section-header">
+        <h2>Novidades & Lançamentos</h2>
+        <p>Os modelos mais recentes e tendências em óptica de moda.</p>
+      </div>
+      <div class="product-showcase-grid" id="novidadesGrid"></div>
+    </section>
+
+    <!-- CTA EXPLORE -->
+    <section class="cta-explore">
+      <div class="cta-explore-inner">
+        <h2>Explore Nosso Catálogo Completo</h2>
+        <p>Encontre a armação perfeita para seu estilo. Filtros avançados, marcas internacionais e nacionais.</p>
+        <a href="#" onclick="showCategory('armacoes');return false" class="btn-cta-primary">Ver Todos os Produtos</a>
+      </div>
+    </section>
+  </div>
+
+  <!-- CATALOG VIEW -->
+  <div class="main-container" id="catalogView">
+    <!-- FILTERS -->
+    <aside class="filters-sidebar">
+      <div class="filter-section">
+        <h4 onclick="toggleFilterSection(this)">Ordenar <span class="filter-toggle">▼</span></h4>
+        <select class="sort-select" onchange="filterProducts()">
+          <option value="relevancia">Relevância</option>
+          <option value="menor-preco">Menor Preço</option>
+          <option value="maior-preco">Maior Preço</option>
+          <option value="mais-vendidos">Mais Vendidos</option>
+        </select>
+      </div>
+
+      <div class="filter-section">
+        <h4 onclick="toggleFilterSection(this)">Marca <span class="filter-toggle">▼</span></h4>
+        <div class="filter-group" id="brandFilters"></div>
+      </div>
+
+      <div class="filter-section">
+        <h4 onclick="toggleFilterSection(this)">Preço <span class="filter-toggle">▼</span></h4>
+        <div class="price-inputs">
+          <input type="number" id="priceMin" placeholder="Min" onchange="filterProducts()">
+          <input type="number" id="priceMax" placeholder="Máx" onchange="filterProducts()">
+        </div>
+      </div>
+
+      <div class="filter-section">
+        <h4 onclick="toggleFilterSection(this)">Cor <span class="filter-toggle">▼</span></h4>
+        <div class="color-picker">
+          <div class="color-option" style="background:#1858C8" onclick="toggleColor(this)" data-color="azul"></div>
+          <div class="color-option" style="background:#833ab4" onclick="toggleColor(this)" data-color="roxo"></div>
+          <div class="color-option" style="background:#b8860b" onclick="toggleColor(this)" data-color="dourado"></div>
+          <div class="color-option" style="background:#333" onclick="toggleColor(this)" data-color="preto"></div>
+          <div class="color-option" style="background:#e8d4c4" onclick="toggleColor(this)" data-color="bege"></div>
+          <div class="color-option" style="background:#cc2222" onclick="toggleColor(this)" data-color="vermelho"></div>
+        </div>
+      </div>
+
+      <div class="filter-section">
+        <h4 onclick="toggleFilterSection(this)">Formato <span class="filter-toggle">▼</span></h4>
+        <div class="filter-group">
+          <div class="filter-option">
+            <input type="checkbox" id="format-clubmaster" onchange="filterProducts()">
+            <label for="format-clubmaster">Clubmaster</label>
+          </div>
+          <div class="filter-option">
+            <input type="checkbox" id="format-redondo" onchange="filterProducts()">
+            <label for="format-redondo">Redondo</label>
+          </div>
+          <div class="filter-option">
+            <input type="checkbox" id="format-quadrado" onchange="filterProducts()">
+            <label for="format-quadrado">Quadrado</label>
+          </div>
+          <div class="filter-option">
+            <input type="checkbox" id="format-retangular" onchange="filterProducts()">
+            <label for="format-retangular">Retangular</label>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-clear-filters" onclick="clearFilters()">Limpar Filtros</button>
+    </aside>
+
+    <!-- PRODUCTS -->
+    <section class="products-section">
+      <h2 id="categoryTitle">Armações de Grau</h2>
+      <p id="categorySubtitle">Nacionais e importadas dos melhores designers</p>
+      <div class="product-grid" id="productGrid"></div>
+    </section>
+  </div>
+
+  <!-- FOOTER -->
+  <footer id="footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h4>Sobre Visiomais</h4>
+        <a href="#">Quem Somos</a>
+        <a href="#">Nossa História</a>
+        <a href="#">Certificações</a>
+        <a href="#">Blog</a>
+      </div>
+      <div class="footer-col">
+        <h4>Produtos</h4>
+        <a href="#" onclick="showCategory('armacoes')">Armações</a>
+        <a href="#" onclick="showCategory('lentes')">Lentes de Grau</a>
+        <a href="#" onclick="showCategory('solar')">Óculos de Sol</a>
+        <a href="#">Lentes de Contato</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contato</h4>
+        <a href="tel:5543988401870">(43) 98840-1870</a>
+        <a href="https://wa.me/5543988401870" target="_blank">WhatsApp</a>
+        <a href="index.html#lojas">Nossas Lojas</a>
+        <a href="#">Horário de Funcionamento</a>
+      </div>
+      <div class="footer-col">
+        <h4>Informações</h4>
+        <a href="#">Política de Privacidade</a>
+        <a href="#">Termos de Serviço</a>
+        <a href="#">Frete e Entrega</a>
+        <a href="#">Trocas e Devoluções</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>&copy; 2026 Óptica Visiomais. Todos os direitos reservados.</div>
+      <div>Desenvolvido com ❤ para sua melhor visão</div>
+    </div>
+  </footer>
+
+  <script>
+    const products = {
+      armacoes: [
+        {id: 1, brand: "Ray-Ban", name: "RB5154 Clubmaster", spec: "Acetato • Unissex", price: 599, original: 799, badge: "OFERTA", label: "Bestseller", rating: 5, color: "azul", format: "Clubmaster", desc: "Clássico atemporal com estilo vintage moderno"},
+        {id: 2, brand: "Prada", name: "PR 09WV", spec: "Acetato • Feminino", price: 890, original: 1100, badge: "OFERTA", label: "Premium", rating: 5, color: "roxo", format: "Quadrado", desc: "Design sofisticado para mulheres elegantes"},
+        {id: 3, brand: "Michael Kors", name: "MK3048 Chelsea", spec: "Metal • Feminino", price: 620, original: 780, badge: "OFERTA", label: "Tendência", rating: 5, color: "dourado", format: "Retangular", desc: "Acabamento dourado premium e brilho sofisticado"},
+        {id: 4, brand: "Tommy Hilfiger", name: "TH1810", spec: "Metal • Unissex", price: 380, original: 499, badge: "OFERTA", label: "", rating: 4, color: "vermelho", format: "Retangular", desc: "Conforto e estilo para uso diário"},
+        {id: 5, brand: "Oakley", name: "OX8046 Airdrop", spec: "Metal • Masculino", price: 489, original: null, badge: "NOVO", label: "Premium", rating: 5, color: "preto", format: "Quadrado", desc: "Tecnologia de ponta para homens ativos"},
+        {id: 6, brand: "Chilli Beans", name: "CB 3028 Round", spec: "Acetato • Unissex", price: 299, original: null, badge: "NACIONAL", label: "", rating: 4, color: "bege", format: "Redondo", desc: "Marca nacional de qualidade e bom gosto"},
+        {id: 7, brand: "Carrera", name: "2019T/S", spec: "Acetato • Masculino", price: 450, original: null, badge: "NOVO", label: "Destaque", rating: 5, color: "preto", format: "Quadrado", desc: "Design audacioso para homens modernos"},
+        {id: 8, brand: "Dolce & Gabbana", name: "DG3334 Havana", spec: "Metal • Feminino", price: 680, original: null, badge: "PREMIUM", label: "Luxo", rating: 5, color: "dourado", format: "Clubmaster", desc: "Luxo italiano em forma de óculos de grau"}
+      ],
+      lentes: [
+        {id: 9, brand: "Varilux", name: "Varilux Comfort", spec: "Progressiva • Índice 1.67", price: 1200, original: 1500, badge: "NOVO", label: "Varilux", rating: 5, color: "azul", format: "", desc: "Lentes progressivas de última geração"},
+        {id: 10, brand: "Essilor", name: "Crizal Prevencia", spec: "Anti-reflexo • UV", price: 450, original: null, badge: "OFERTA", label: "", rating: 5, color: "azul", format: "", desc: "Proteção premium contra luz azul"},
+        {id: 11, brand: "Varilux", name: "Varilux X Design", spec: "Progressiva Premium", price: 1500, original: 1890, badge: "OFERTA", label: "Premium", rating: 5, color: "azul", format: "", desc: "Tecnologia avançada com campo visual amplo"},
+        {id: 12, brand: "Transitions", name: "Transitions Gen 9", spec: "Fotossensível", price: 680, original: 850, badge: "NOVO", label: "", rating: 5, color: "roxo", format: "", desc: "Adaptação automática à luz solar"},
+      ],
+      solar: [
+        {id: 13, brand: "Ray-Ban", name: "RB3025 Aviador", spec: "Polarizado • UV400", price: 590, original: null, badge: "NOVO", label: "", rating: 5, color: "dourado", format: "", desc: "Clássico intemporável com proteção total"},
+        {id: 14, brand: "Oakley", name: "Holbrook", spec: "Polarizado • UV400", price: 720, original: null, badge: "PREMIUM", label: "", rating: 5, color: "preto", format: "", desc: "Estilo esportivo com máxima proteção"},
+        {id: 15, brand: "Ray-Ban", name: "RB4147 Round", spec: "Vintage • UV400", price: 520, original: 650, badge: "OFERTA", label: "", rating: 5, color: "preto", format: "", desc: "Design vintage com proteção moderna"},
+        {id: 16, brand: "Prada", name: "PR 51US", spec: "Premium • UV400", price: 950, original: null, badge: "PREMIUM", label: "Luxo", rating: 5, color: "dourado", format: "", desc: "Sofisticação italiana em óculos escuros"},
+      ]
+    };
+
+    let currentCategory = 'armacoes';
+    let selectedColors = [];
+    let showingCatalog = false;
+
+    function showHomepage() {
+      document.getElementById('homepage').style.display = 'block';
+      document.getElementById('catalogView').classList.remove('active');
+      showingCatalog = false;
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function showCategory(category) {
+      currentCategory = category;
+      document.getElementById('homepage').style.display = 'none';
+      document.getElementById('catalogView').classList.add('active');
+      showingCatalog = true;
+
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      if (event && event.target) {
+        event.target.closest('.nav-item').classList.add('active');
+      }
+
+      const titles = {
+        armacoes: 'Armações de Grau',
+        lentes: 'Lentes de Grau',
+        solar: 'Óculos de Sol'
+      };
+      const subtitles = {
+        armacoes: 'Seleção premium de marcas nacionais e internacionais de renome',
+        lentes: 'Tecnologia avançada para visão clara e confortável',
+        solar: 'Proteção UV completa com estilo e sofisticação'
+      };
+
+      document.getElementById('categoryTitle').textContent = titles[category];
+      document.getElementById('categorySubtitle').textContent = subtitles[category];
+      clearFilters();
+      updateBrandFilters();
+      filterProducts();
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function updateBrandFilters() {
+      const brandContainer = document.getElementById('brandFilters');
+      brandContainer.innerHTML = '';
+
+      const categoryBrands = {
+        armacoes: ['Ray-Ban', 'Prada', 'Michael Kors', 'Oakley', 'Chilli Beans', 'Carrera', 'Tommy Hilfiger', 'Dolce & Gabbana'],
+        lentes: ['Varilux', 'Essilor', 'Transitions'],
+        solar: ['Ray-Ban', 'Oakley', 'Prada']
+      };
+
+      const brands = categoryBrands[currentCategory] || [];
+
+      brands.forEach(brand => {
+        const id = `brand-${brand.toLowerCase().replace(/\s+/g, '-').replace(/&/g, 'and')}`;
+        const html = `
+          <div class="filter-option">
+            <input type="checkbox" id="${id}" onchange="filterProducts()">
+            <label for="${id}">${brand}</label>
+          </div>
+        `;
+        brandContainer.innerHTML += html;
+      });
+    }
+
+    function toggleColor(element) {
+      element.classList.toggle('selected');
+      selectedColors = Array.from(document.querySelectorAll('.color-option.selected')).map(el => el.dataset.color);
+      filterProducts();
+    }
+
+    function clearFilters() {
+      document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+      document.querySelectorAll('.color-option').forEach(co => co.classList.remove('selected'));
+      document.getElementById('priceMin').value = '';
+      document.getElementById('priceMax').value = '';
+      document.querySelector('.sort-select').value = 'relevancia';
+      selectedColors = [];
+      filterProducts();
+    }
+
+    function filterProducts() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const priceMin = parseInt(document.getElementById('priceMin').value) || 0;
+      const priceMax = parseInt(document.getElementById('priceMax').value) || 9999;
+      const sort = document.querySelector('.sort-select').value;
+
+      const selectedBrands = Array.from(document.querySelectorAll('#brandFilters input[type="checkbox"]:checked'))
+        .map(cb => {
+          const id = cb.id.replace('brand-', '');
+          return id.charAt(0).toUpperCase() + id.slice(1).replace('-', ' ').replace('and', '&');
+        });
+
+      const selectedFormats = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+        .filter(cb => cb.id.startsWith('format-'))
+        .map(cb => cb.id.replace('format-', ''));
+
+      // Se há busca, procura em TODAS as categorias. Senão, filtra apenas na categoria ativa
+      let sourceProducts = search.length > 0
+        ? [].concat(products.armacoes, products.lentes, products.solar)
+        : (products[currentCategory] || []);
+
+      let filtered = sourceProducts.filter(p => {
+        const matchesSearch = p.brand.toLowerCase().includes(search) || p.name.toLowerCase().includes(search);
+        const matchesPrice = p.price >= priceMin && p.price <= priceMax;
+        const matchesBrand = selectedBrands.length === 0 || selectedBrands.some(b => p.brand.toLowerCase().includes(b.toLowerCase()));
+        const matchesColor = selectedColors.length === 0 || selectedColors.includes(p.color);
+        const matchesFormat = selectedFormats.length === 0 || selectedFormats.includes(p.format);
+
+        return matchesSearch && matchesPrice && matchesBrand && matchesColor && matchesFormat;
+      });
+
+      if (sort === 'menor-preco') filtered.sort((a, b) => a.price - b.price);
+      else if (sort === 'maior-preco') filtered.sort((a, b) => b.price - a.price);
+      else if (sort === 'mais-vendidos') filtered.sort((a, b) => b.rating - a.rating);
+
+      renderProducts(filtered);
+    }
+
+    function renderProducts(items) {
+      const grid = document.getElementById('productGrid');
+      if (items.length === 0) {
+        grid.innerHTML = '<div class="no-results" style="grid-column:1/-1">Nenhum produto encontrado com os filtros selecionados.</div>';
+        return;
+      }
+
+      grid.innerHTML = items.map(p => `
+        <div class="product-card" onclick="location.href='produto.html?id=${p.id}'">
+          <div class="product-visual">
+            ${generateGlassesSVG()}
+            <div class="product-badge">${p.badge}</div>
+            ${p.label ? `<div class="product-label">${p.label}</div>` : ''}
+          </div>
+          <div class="product-body">
+            <div class="product-brand">${p.brand}</div>
+            <div class="product-name">${p.name}</div>
+            <div class="product-desc">${p.desc || p.spec}</div>
+            <div class="product-spec">${p.spec}</div>
+            <div class="product-rating">
+              ${Array(p.rating).fill().map(() => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>').join('')}
+            </div>
+            <div class="product-price">
+              ${p.original ? `<span class="price-old">R$ ${p.original}</span>` : ''}
+              <span class="price-new">R$ ${p.price}</span>
+            </div>
+            <a href="produto.html?id=${p.id}" class="product-cta">Ver Detalhes</a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function generateGlassesSVG() {
+      const frames = [
+        '<svg viewBox="0 0 280 120" fill="none"><rect x="10" y="18" width="110" height="80" rx="24" stroke="#1858C8" stroke-width="7" fill="rgba(24,88,200,0.07)"/><rect x="160" y="18" width="110" height="80" rx="24" stroke="#1858C8" stroke-width="7" fill="rgba(24,88,200,0.07)"/><path d="M120 58 C126 50 134 46 140 46 C146 46 154 50 160 58" stroke="#1858C8" stroke-width="7" fill="none" stroke-linecap="round"/></svg>',
+        '<svg viewBox="0 0 280 120" fill="none"><rect x="10" y="18" width="110" height="80" rx="14" stroke="#833ab4" stroke-width="7" fill="rgba(131,58,180,0.07)"/><rect x="160" y="18" width="110" height="80" rx="14" stroke="#833ab4" stroke-width="7" fill="rgba(131,58,180,0.07)"/><path d="M120 58 C126 50 134 46 140 46 C146 46 154 50 160 58" stroke="#833ab4" stroke-width="7" fill="none" stroke-linecap="round"/></svg>',
+        '<svg viewBox="0 0 280 120" fill="none"><rect x="10" y="18" width="110" height="80" rx="10" stroke="#b8860b" stroke-width="7" fill="rgba(184,134,11,0.07)"/><rect x="160" y="18" width="110" height="80" rx="10" stroke="#b8860b" stroke-width="7" fill="rgba(184,134,11,0.07)"/><path d="M120 58 C126 50 134 46 140 46 C146 46 154 50 160 58" stroke="#b8860b" stroke-width="7" fill="none" stroke-linecap="round"/></svg>',
+        '<svg viewBox="0 0 280 120" fill="none"><rect x="10" y="18" width="110" height="80" rx="30" stroke="#cc2222" stroke-width="7" fill="rgba(204,34,34,0.06)"/><rect x="160" y="18" width="110" height="80" rx="30" stroke="#cc2222" stroke-width="7" fill="rgba(204,34,34,0.06)"/><path d="M120 58 C126 50 134 46 140 46 C146 46 154 50 160 58" stroke="#cc2222" stroke-width="7" fill="none" stroke-linecap="round"/></svg>'
+      ];
+      return frames[Math.floor(Math.random() * frames.length)];
+    }
+
+    function toggleFilterSection(header) {
+      const section = header.closest('.filter-section');
+      section.classList.toggle('open');
+    }
+
+    function renderOfertas() {
+      const allProducts = [].concat(products.armacoes, products.lentes, products.solar);
+      const ofertas = allProducts.filter(p => p.original !== null).slice(0, 4);
+
+      const grid = document.getElementById('ofertasGrid');
+      grid.innerHTML = ofertas.map(p => {
+        const discount = Math.round(((p.original - p.price) / p.original) * 100);
+        return `
+          <div class="oferta-card" onclick="location.href='produto.html?id=${p.id}'">
+            <div class="oferta-visual">
+              ${generateGlassesSVG()}
+              <div class="desconto-badge">-${discount}%</div>
+            </div>
+            <div class="oferta-body">
+              <div class="oferta-brand">${p.brand}</div>
+              <div class="oferta-name">${p.name}</div>
+              <div class="oferta-prices">
+                <span class="oferta-old">R$ ${p.original}</span>
+                <span class="oferta-new">R$ ${p.price}</span>
+              </div>
+              <a href="produto.html?id=${p.id}" class="oferta-cta">Ver Oferta</a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderDestaque() {
+      const allProducts = [].concat(products.armacoes, products.lentes, products.solar);
+      const destaque = allProducts
+        .filter(p => p.rating === 5 && p.label)
+        .slice(0, 4);
+
+      const grid = document.getElementById('destaqueGrid');
+      grid.innerHTML = destaque.map(p => `
+        <div class="showcase-card" onclick="location.href='produto.html?id=${p.id}'">
+          <div class="showcase-visual">
+            ${generateGlassesSVG()}
+            <div class="showcase-badge">${p.label}</div>
+          </div>
+          <div class="showcase-body">
+            <div class="showcase-brand">${p.brand}</div>
+            <div class="showcase-name">${p.name}</div>
+            <div class="showcase-desc">${p.desc || p.spec}</div>
+            <div class="showcase-price">R$ ${p.price}</div>
+            <a href="produto.html?id=${p.id}" class="showcase-cta">Explorar</a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderNovidades() {
+      const allProducts = [].concat(products.armacoes, products.lentes, products.solar);
+      const novidades = allProducts
+        .filter(p => p.badge === 'NOVO')
+        .slice(0, 4);
+
+      const grid = document.getElementById('novidadesGrid');
+      grid.innerHTML = novidades.map(p => `
+        <div class="showcase-card" onclick="location.href='produto.html?id=${p.id}'">
+          <div class="showcase-visual">
+            ${generateGlassesSVG()}
+            <div class="showcase-badge">Novo</div>
+          </div>
+          <div class="showcase-body">
+            <div class="showcase-brand">${p.brand}</div>
+            <div class="showcase-name">${p.name}</div>
+            <div class="showcase-desc">${p.desc || p.spec}</div>
+            <div class="showcase-price">R$ ${p.price}</div>
+            <a href="produto.html?id=${p.id}" class="showcase-cta">Conferir</a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Initial setup
+    updateBrandFilters();
+    renderProducts(products[currentCategory]);
+    renderOfertas();
+    renderDestaque();
+    renderNovidades();
+
+    // Mobile filter toggles
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.innerWidth <= 768) {
+        document.querySelectorAll('.filter-section h4').forEach(h4 => {
+          h4.addEventListener('click', () => toggleFilterSection(h4));
+        });
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>&#xd3;tica Visiomais | Londrina</title>
+  <meta name="description" content="Ajudamos voc&#xea; a enxergar melhor. Varilux Especialista em Londrina. Shopping Com-Tour e Edif&#xed;cio Square Garden."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --navy:#030d1f;--navy-mid:#081a38;--blue:#1858C8;--blue-dk:#0f3d91;--blue-lt:#2a6edf;
+      --mist:#c8d9ff;--gold:#c4a35a;--cream:#f7f4ef;--white:#fff;
+      --gray:#64748b;--gray-lt:#e8ecf4;
+      --font-d:'Cormorant Garamond',Georgia,serif;--font-b:'DM Sans',system-ui,sans-serif;
+      --r:14px;--sh:0 8px 32px rgba(3,13,31,.10);--sh-lg:0 24px 64px rgba(3,13,31,.15)
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font-b);background:var(--white);color:#1e293b;line-height:1.65;overflow-x:hidden}
+    ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--navy)}::-webkit-scrollbar-thumb{background:var(--blue);border-radius:2px}
+    ::selection{background:var(--blue);color:white}
+    h1,h2,h3,h4{font-family:var(--font-d);line-height:1.12}
+    .container{max-width:1200px;margin:0 auto;padding:0 32px}
+    .eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:var(--font-b);font-size:.7rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--blue)}
+    .eyebrow::before{content:'';width:24px;height:1px;background:currentColor;flex-shrink:0}
+    .s-title{font-size:clamp(2.2rem,3.5vw,3.4rem);font-weight:600;color:var(--navy);margin-bottom:16px}
+    .s-sub{font-size:.975rem;color:var(--gray);max-width:500px;line-height:1.8}
+    .btn{display:inline-flex;align-items:center;gap:10px;padding:13px 30px;border-radius:2px;font-family:var(--font-b);font-size:.85rem;font-weight:600;letter-spacing:.05em;cursor:pointer;border:none;text-decoration:none;transition:all .3s ease}
+    .btn-primary{background:var(--blue);color:white;box-shadow:0 4px 20px rgba(24,88,200,.3)}.btn-primary:hover{background:var(--blue-dk);transform:translateY(-2px);box-shadow:0 8px 28px rgba(24,88,200,.4)}
+    .btn-outline{background:transparent;color:white;border:1.5px solid rgba(255,255,255,.45)}.btn-outline:hover{background:rgba(255,255,255,.07);border-color:white;transform:translateY(-2px)}
+    #header{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 32px;transition:all .4s cubic-bezier(.2,.8,.3,1);background:transparent}
+    #header.scrolled{background:linear-gradient(180deg,rgba(3,13,31,.95) 0%,rgba(3,13,31,.92) 100%);backdrop-filter:blur(12px);box-shadow:0 4px 20px rgba(0,0,0,.25);padding:16px 32px}
+    .header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:32px;height:auto}
+    .logo{display:flex;align-items:center;gap:14px;text-decoration:none;transition:all .3s;position:relative}
+    .logo:hover{opacity:.85}
+    .logo-svg{width:44px;height:44px;flex-shrink:0;transition:transform .3s cubic-bezier(.2,.8,.3,1)}
+    .logo:hover .logo-svg{transform:scale(1.08)}
+    .logo-wordmark{display:flex;flex-direction:column;gap:2px;line-height:1}
+    .logo-name{font-family:var(--font-d);font-size:1.1rem;font-weight:700;color:white;letter-spacing:.02em;text-transform:uppercase;background:linear-gradient(135deg,white,rgba(255,255,255,.9));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .logo-sub{font-size:.65rem;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;font-weight:700}
+    nav{display:flex;align-items:center;gap:40px}
+    nav a{color:rgba(255,255,255,.6);text-decoration:none;font-size:.9rem;font-weight:600;letter-spacing:.03em;transition:all .35s cubic-bezier(.2,.8,.3,1);text-transform:capitalize;position:relative;text-shadow:0 1px 3px rgba(0,0,0,.2)}
+    nav a::before{content:'';position:absolute;bottom:-4px;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),transparent);transform:scaleX(0);transform-origin:left;transition:transform .35s cubic-bezier(.2,.8,.3,1)}
+    nav a:hover{color:rgba(255,255,255,.95)}
+    nav a:hover::before{transform:scaleX(1)}
+    .nav-shop{background:linear-gradient(135deg,var(--gold),#d4af37)!important;color:var(--navy)!important;padding:12px 28px;border-radius:var(--r);font-weight:700!important;letter-spacing:.05em;transition:all .35s cubic-bezier(.2,.8,.3,1)!important;box-shadow:0 4px 16px rgba(196,163,90,.35)!important;position:relative;overflow:hidden}
+    .nav-shop::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.1);transform:translateX(-100%);transition:transform .3s cubic-bezier(.2,.8,.3,1)}
+    .nav-shop:hover::before{transform:translateX(100%)}
+    .nav-shop:hover{box-shadow:0 8px 28px rgba(196,163,90,.45)!important;transform:translateY(-3px)!important}
+    .hamburger{display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:6px;padding:4px;transition:all .3s;z-index:101}
+    .hamburger:hover span{background:var(--gold)}
+    .hamburger span{display:block;width:24px;height:2px;background:white;transition:all .3s;border-radius:1px}
+    .hamburger.open span:nth-child(1){transform:rotate(45deg) translate(8px,8px)}
+    .hamburger.open span:nth-child(2){opacity:0}
+    .hamburger.open span:nth-child(3){transform:rotate(-45deg) translate(8px,-8px)}
+    .mobile-nav{display:none;position:fixed;inset:0;z-index:99;background:linear-gradient(180deg,var(--navy) 0%,rgba(3,13,31,.97) 100%);flex-direction:column;align-items:center;justify-content:center;gap:44px;backdrop-filter:blur(8px)}
+    .mobile-nav.open{display:flex}
+    .mobile-nav a{color:rgba(255,255,255,.85);text-decoration:none;font-family:var(--font-d);font-size:2.2rem;font-weight:400;letter-spacing:.04em;transition:all .3s cubic-bezier(.2,.8,.3,1);position:relative}
+    .mobile-nav a::before{content:'';position:absolute;bottom:-8px;left:0;right:0;height:2px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.2,.8,.3,1)}
+    .mobile-nav a:hover{color:white;text-shadow:0 0 20px rgba(196,163,90,.4)}
+    .mobile-nav a:hover::before{transform:scaleX(1)}
+    .mobile-nav a:hover{color:white}
+    .mobile-close{position:absolute;top:28px;right:28px;background:none;border:none;color:rgba(255,255,255,.55);cursor:pointer;font-size:1.5rem;line-height:1}
+    #hero{min-height:100vh;background:var(--navy);position:relative;overflow:hidden;display:flex;align-items:center;padding-top:80px}
+    .hero-glow{position:absolute;border-radius:50%;filter:blur(120px);pointer-events:none}
+    .hero-glow-a{width:800px;height:800px;background:rgba(24,88,200,.16);top:-300px;left:50%;transform:translateX(-30%)}
+    .hero-glow-b{width:300px;height:300px;background:rgba(196,163,90,.07);bottom:0;right:0}
+    .hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:80px;padding:100px 0 80px}
+    .hero-eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:.7rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:32px}
+    .hero-eyebrow::before{content:'';width:28px;height:1px;background:var(--gold)}
+    h1.hero-h1{font-size:clamp(3rem,4.8vw,5.2rem);font-weight:600;color:white;margin-bottom:28px;line-height:1.05}
+    h1.hero-h1 em{font-style:italic;font-weight:400;color:var(--mist)}
+    .hero-tagline{font-size:.975rem;font-weight:300;color:rgba(255,255,255,.58);max-width:420px;line-height:1.85;margin-bottom:44px}
+    .hero-actions{display:flex;gap:16px;flex-wrap:wrap}
+    .hero-stats{display:flex;margin-top:64px;padding-top:44px;border-top:1px solid rgba(255,255,255,.08)}
+    .stat{flex:1;padding-right:32px}
+    .stat+.stat{padding-right:0;padding-left:32px;border-left:1px solid rgba(255,255,255,.1)}
+    .stat-val{font-family:var(--font-d);font-size:2.6rem;font-weight:600;color:white;line-height:1}
+    .stat-lbl{font-size:.75rem;font-weight:400;color:rgba(255,255,255,.42);margin-top:6px;letter-spacing:.04em}
+    .hero-visual{display:flex;align-items:center;justify-content:center;position:relative}
+    .hero-logo-big{width:380px;height:380px;animation:float 7s ease-in-out infinite;filter:drop-shadow(0 0 60px rgba(24,88,200,.55)) drop-shadow(0 0 120px rgba(24,88,200,.2))}
+    .hero-arc{position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,.06)}
+    .hero-arc:nth-child(1){width:450px;height:450px;animation:spin 45s linear infinite}
+    .hero-arc:nth-child(2){width:540px;height:540px;animation:spin 65s linear infinite reverse}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-22px)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    #colecao{padding:140px 0;background:var(--cream)}
+    .sec-header{margin-bottom:72px}.sec-header.center{text-align:center}.sec-header.center .s-sub{margin:0 auto}
+    .col-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+    .col-card{border-radius:var(--r);overflow:hidden;background:var(--white);border:2px solid var(--gray-lt);transition:all .35s cubic-bezier(.2,.8,.3,1);display:flex;flex-direction:column}
+    .col-card:hover{transform:translateY(-12px);box-shadow:0 24px 48px rgba(3,13,31,.15);border-color:var(--blue)}
+    .col-visual{height:220px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+    .col-badge{position:absolute;top:20px;right:20px;background:var(--gold);color:var(--navy);font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 14px;border-radius:2px}
+    .col-body{padding:32px;display:flex;flex-direction:column;flex:1}
+    .col-body h3{font-size:1.5rem;font-weight:600;color:var(--navy);margin-bottom:10px}
+    .col-body p{font-size:.875rem;color:var(--gray);line-height:1.75;margin-bottom:20px}
+    .col-features{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:28px;flex:1}
+    .col-features li{display:flex;align-items:center;gap:10px;font-size:.85rem;color:var(--gray)}
+    .col-features li::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--gold);flex-shrink:0}
+    .col-cta-note{text-align:center;font-size:.9rem;color:var(--gray)}
+    .col-cta-note a{color:var(--blue);font-weight:500;text-decoration:none;border-bottom:1px solid rgba(24,88,200,.35);padding-bottom:1px}
+    .col-cta-note a:hover{border-color:var(--blue)}
+    #servicos{padding:140px 0;background:var(--white)}
+    .svc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:72px;background:var(--gray-lt)}
+    .svc-card{background:var(--white);padding:48px 32px;transition:all .4s ease;cursor:default}
+    .svc-card:hover{background:var(--navy)}
+    .svc-num{font-family:var(--font-d);font-size:3.5rem;font-weight:700;color:var(--gray-lt);line-height:1;margin-bottom:32px;transition:color .4s}
+    .svc-card:hover .svc-num{color:rgba(255,255,255,.08)}
+    .svc-icon{width:48px;height:48px;border-radius:var(--r);background:var(--cream);border:1px solid var(--gray-lt);display:flex;align-items:center;justify-content:center;margin-bottom:20px;transition:all .4s}
+    .svc-card:hover .svc-icon{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.1)}
+    .svc-icon svg{width:22px;height:22px;color:var(--blue);transition:color .4s}
+    .svc-card:hover .svc-icon svg{color:rgba(255,255,255,.85)}
+    .svc-card h3{font-size:1.15rem;font-weight:600;color:var(--navy);margin-bottom:10px;transition:color .4s}
+    .svc-card:hover h3{color:white}
+    .svc-card p{font-size:.85rem;color:var(--gray);line-height:1.75;transition:color .4s}
+    .svc-card:hover p{color:rgba(255,255,255,.5)}
+    #diferenciais{padding:140px 0;background:var(--navy);position:relative;overflow:hidden}
+    .diff-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 65% 50%,rgba(24,88,200,.18) 0%,transparent 60%);pointer-events:none}
+    .diff-inner{position:relative;z-index:1;display:grid;grid-template-columns:5fr 6fr;gap:100px;align-items:start}
+    .diff-lhs .eyebrow{color:var(--gold)}.diff-lhs .eyebrow::before{background:var(--gold)}
+    .diff-lhs .s-title{color:white}.diff-lhs .s-sub{color:rgba(255,255,255,.5);max-width:360px}
+    .diff-varilux{display:flex;align-items:flex-start;gap:18px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--r);padding:22px 24px;margin-top:48px}
+    .varilux-badge{flex-shrink:0;background:var(--gold);color:var(--navy);border-radius:3px;padding:8px 14px;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-align:center;line-height:1.5}
+    .diff-varilux p{font-size:.875rem;color:rgba(255,255,255,.6);line-height:1.7}.diff-varilux strong{color:white}
+    .diff-rhs{display:flex;flex-direction:column;border-top:1px solid rgba(255,255,255,.07)}
+    .diff-item{display:flex;gap:24px;padding:32px 0;border-bottom:1px solid rgba(255,255,255,.07);transition:padding-left .3s}
+    .diff-item:hover{padding-left:10px}
+    .diff-num{font-family:var(--font-d);font-size:1.5rem;font-style:italic;color:rgba(255,255,255,.18);flex-shrink:0;width:36px;padding-top:2px}
+    .diff-item h3{font-size:1.05rem;font-weight:500;color:white;margin-bottom:7px}
+    .diff-item p{font-size:.85rem;color:rgba(255,255,255,.47);line-height:1.7}
+    #lojas{padding:140px 0;background:var(--white)}
+    .lojas-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-top:72px}
+    .loja-card{border-radius:20px;overflow:hidden;border:1px solid var(--gray-lt);transition:all .35s ease}
+    .loja-card:hover{box-shadow:var(--sh-lg);border-color:var(--blue);transform:translateY(-6px)}
+    .loja-map{height:200px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+    .loja-map-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:36px 36px}
+    .loja-unit-tag{position:absolute;top:18px;left:18px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:2px;padding:4px 12px;font-size:.62rem;font-weight:700;letter-spacing:.18em;color:white;text-transform:uppercase}
+    .loja-pin{width:52px;height:52px;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.3);position:relative;z-index:1}
+    .loja-pin svg{width:24px;height:24px;color:var(--blue)}
+    .loja-body{padding:32px 36px 36px}
+    .loja-body h3{font-family:var(--font-d);font-size:1.55rem;font-weight:600;color:var(--navy);margin-bottom:20px}
+    .loja-detail{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+    .loja-detail svg{width:14px;height:14px;color:var(--blue);flex-shrink:0;margin-top:3px}
+    .loja-detail span{font-size:.85rem;color:var(--gray);line-height:1.6}
+    .loja-actions{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap}
+    .btn-loja{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:2px;font-size:.8rem;font-family:var(--font-b);font-weight:600;cursor:pointer;text-decoration:none;transition:all .25s;border:none;letter-spacing:.04em}
+    .btn-loja-primary{background:var(--blue);color:white}.btn-loja-primary:hover{background:var(--blue-dk);transform:translateY(-1px)}
+    .btn-loja-ghost{background:transparent;color:var(--gray);border:1.5px solid var(--gray-lt)}.btn-loja-ghost:hover{border-color:var(--blue);color:var(--blue)}
+    #depoimentos{padding:140px 0;background:var(--cream)}
+    .dep-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:72px}
+    .dep-card{background:var(--white);border-radius:var(--r);padding:36px;border:1px solid var(--gray-lt);transition:all .35s}
+    .dep-card:hover{transform:translateY(-6px);box-shadow:var(--sh-lg);border-color:rgba(24,88,200,.3)}
+    .dep-stars{display:flex;gap:3px;margin-bottom:22px}.dep-stars svg{width:15px;height:15px;color:var(--gold);fill:currentColor}
+    .dep-quote{font-family:var(--font-d);font-size:1.15rem;font-weight:400;color:#374151;line-height:1.8;margin-bottom:28px;font-style:italic}
+    .dep-author{display:flex;align-items:center;gap:14px}
+    .dep-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue-lt));display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:1.1rem;font-weight:700;color:white;flex-shrink:0}
+    .dep-name{font-weight:600;font-size:.88rem;color:var(--navy)}.dep-since{font-size:.76rem;color:var(--gray);margin-top:2px}
+    #cta{padding:120px 0;background:linear-gradient(140deg,var(--blue-dk) 0%,var(--blue) 100%);position:relative;overflow:hidden;text-align:center}
+    .cta-glow{position:absolute;width:600px;height:600px;border-radius:50%;background:rgba(255,255,255,.06);top:-200px;left:50%;transform:translateX(-50%);filter:blur(80px)}
+    .cta-inner{position:relative;z-index:1}
+    .cta-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:2px;padding:6px 18px;font-size:.68rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.85);margin-bottom:28px}
+    .cta-inner h2{font-family:var(--font-d);font-size:clamp(2.6rem,5vw,4.2rem);font-weight:600;color:white;margin-bottom:20px;text-shadow:0 2px 16px rgba(0,0,0,.2)}
+    .cta-inner p{font-size:.975rem;color:rgba(255,255,255,.65);max-width:480px;margin:0 auto 48px;line-height:1.8}
+    .cta-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+    .btn-wpp{background:#25D366;color:white;box-shadow:0 4px 20px rgba(37,211,102,.35)}.btn-wpp:hover{background:#1ebe5d;transform:translateY(-2px)}
+    .btn-ig{background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);color:white}.btn-ig:hover{transform:translateY(-2px);opacity:.9}
+    #footer{background:var(--navy);padding:72px 0 36px}
+    .footer-top{display:grid;grid-template-columns:2.5fr 1fr 1fr 1fr;gap:60px;padding-bottom:56px;border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:36px}
+    .footer-brand p{font-size:.82rem;color:rgba(255,255,255,.4);line-height:1.8;margin-top:20px;max-width:270px}
+    .footer-social{display:flex;gap:10px;margin-top:28px}
+    .social-btn{width:34px;height:34px;border-radius:4px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.55);text-decoration:none;transition:all .2s}
+    .social-btn:hover{background:var(--blue);border-color:var(--blue);color:white;transform:translateY(-2px)}.social-btn svg{width:15px;height:15px}
+    .footer-col h4{font-size:.62rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:20px}
+    .footer-col ul{list-style:none;display:flex;flex-direction:column;gap:12px}
+    .footer-col ul li a{color:rgba(255,255,255,.5);text-decoration:none;font-size:.85rem;transition:color .2s}.footer-col ul li a:hover{color:white}
+    .footer-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+    .footer-copy{font-size:.76rem;color:rgba(255,255,255,.22)}.footer-copy span{color:rgba(255,255,255,.38)}
+    .reveal{opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s ease}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+    .reveal-delay-1{transition-delay:.1s}.reveal-delay-2{transition-delay:.2s}.reveal-delay-3{transition-delay:.3s}.reveal-delay-4{transition-delay:.4s}
+    @media(max-width:1100px){.col-grid{grid-template-columns:repeat(2,1fr)}.svc-grid{grid-template-columns:repeat(2,1fr)}.dep-grid{grid-template-columns:repeat(2,1fr)}.footer-top{grid-template-columns:1fr 1fr;gap:40px}.diff-inner{gap:60px}}
+    @media(max-width:768px){
+      nav{display:none}
+      .hamburger{display:flex}
+      #header{padding:14px 16px}
+      .header-inner{gap:16px}
+      .logo-svg{width:40px;height:40px}
+      .logo-name{font-size:.95rem}
+      #header.scrolled{padding:12px 16px}
+      .hero-inner{grid-template-columns:1fr;text-align:center;gap:48px;padding:80px 0}
+      .hero-actions{justify-content:center}
+      .hero-visual{order:-1}
+      .hero-logo-big{width:240px;height:240px}
+      .hero-arc:nth-child(1){width:280px;height:280px}
+      .hero-arc:nth-child(2){width:340px;height:340px}
+      .hero-stats{gap:0}
+      .stat{text-align:center}
+      .stat+.stat{padding-left:16px}
+      .diff-inner{grid-template-columns:1fr;gap:56px}
+      .lojas-grid{grid-template-columns:1fr}
+      .svc-grid{grid-template-columns:1fr}
+      .dep-grid{grid-template-columns:1fr}
+      .footer-top{grid-template-columns:1fr}
+    }
+    @media(max-width:480px){
+      #header{padding:12px 12px}
+      .header-inner{gap:12px}
+      .logo-svg{width:36px;height:36px}
+      .logo-name{font-size:.85rem}
+      .logo-sub{font-size:.5rem}
+      .hamburger{width:20px}
+      .hamburger span{width:20px;height:1.5px}
+      .hero-stats{flex-wrap:wrap;gap:24px;justify-content:center}
+      .stat+.stat{border-left:none;padding-left:0}
+      .cta-actions{flex-direction:column;align-items:center}
+      .footer-bottom{flex-direction:column;text-align:center}
+      .col-grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="mobile-nav" id="mobileNav">
+    <button class="mobile-close" id="mobileClose">&#x2715;</button>
+    <a href="loja.html">Loja Online</a>
+    <a href="#colecao" onclick="closeMobile()">Cole&#xe7;&#xe3;o</a>
+    <a href="#servicos" onclick="closeMobile()">Servi&#xe7;os</a>
+    <a href="#lojas" onclick="closeMobile()">Lojas</a>
+    <a href="#depoimentos" onclick="closeMobile()">Depoimentos</a>
+    <a href="#cta" onclick="closeMobile()" style="color:rgba(196,163,90,.9)">Agendar Consulta</a>
+  </div>
+  <header id="header">
+    <div class="header-inner">
+      <a href="#" class="logo">
+        <svg class="logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="48" fill="#1858C8"/>
+          <circle cx="50" cy="50" r="38" stroke="white" stroke-width="2.5" fill="none" stroke-dasharray="5 4"/>
+          <circle cx="50" cy="50" r="29" stroke="white" stroke-width="2.5" fill="none" stroke-dasharray="4 3"/>
+          <circle cx="50" cy="50" r="20" stroke="white" stroke-width="2.5" fill="none"/>
+          <circle cx="50" cy="50" r="11" fill="white"/>
+          <circle cx="50" cy="50" r="6" fill="#1858C8"/>
+          <circle cx="53" cy="47" r="2.5" fill="white"/>
+          <path d="M14 50 Q20 44 26 50" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M74 50 Q80 44 86 50" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        </svg>
+        <div class="logo-wordmark">
+          <span class="logo-name">Visiomais</span>
+          <span class="logo-sub">&#xd3;tica</span>
+        </div>
+      </a>
+      <nav>
+        <a href="#colecao">Cole&#xe7;&#xe3;o</a>
+        <a href="#servicos">Servi&#xe7;os</a>
+        <a href="#lojas">Lojas</a>
+        <a href="#depoimentos">Depoimentos</a>
+        <a href="loja.html" class="nav-shop">&#x1f6d2;&nbsp; Loja Online</a>
+      </nav>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </header>
+  <section id="hero">
+    <div class="hero-glow hero-glow-a"></div>
+    <div class="hero-glow hero-glow-b"></div>
+    <div class="container">
+      <div class="hero-inner">
+        <div class="hero-text">
+          <div class="hero-eyebrow">Varilux Especialista Certificado</div>
+          <h1 class="hero-h1">Enxergue o mundo<br/>com <em>clareza total</em></h1>
+          <p class="hero-tagline">Ajudamos voc&#xea; a enxergar melhor atrav&#xe9;s dos seus &#xf3;culos. Atendimento especializado, lentes premium e monturas exclusivas em Londrina.</p>
+          <div class="hero-actions">
+            <a href="#colecao" class="btn btn-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+              Ver Cole&#xe7;&#xe3;o
+            </a>
+            <a href="#cta" class="btn btn-outline">Agendar Consulta</a>
+          </div>
+          <div class="hero-stats">
+            <div class="stat"><div class="stat-val">+10</div><div class="stat-lbl">Anos de experi&#xea;ncia</div></div>
+            <div class="stat"><div class="stat-val">2</div><div class="stat-lbl">Unidades em Londrina</div></div>
+            <div class="stat"><div class="stat-val">&#x2605;&thinsp;5.0</div><div class="stat-lbl">Avalia&#xe7;&#xe3;o no Google</div></div>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-arc"></div>
+          <div class="hero-arc"></div>
+          <svg class="hero-logo-big" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="200" cy="200" r="196" fill="#1858C8"/>
+            <circle cx="200" cy="200" r="173" stroke="white" stroke-width="4.5" fill="none" stroke-dasharray="22 14" opacity="0.32"/>
+            <circle cx="200" cy="200" r="148" stroke="white" stroke-width="4.5" fill="none" stroke-dasharray="18 12" opacity="0.44"/>
+            <circle cx="200" cy="200" r="121" stroke="white" stroke-width="5" fill="none" stroke-dasharray="14 9" opacity="0.56"/>
+            <circle cx="200" cy="200" r="96" stroke="white" stroke-width="5.5" fill="none" stroke-dasharray="11 7" opacity="0.70"/>
+            <circle cx="200" cy="200" r="71" stroke="white" stroke-width="6" fill="none" stroke-dasharray="8 5" opacity="0.84"/>
+            <circle cx="200" cy="200" r="48" stroke="white" stroke-width="7" fill="none" opacity="0.95"/>
+            <circle cx="200" cy="200" r="18" fill="white" opacity="0.95"/>
+            <circle cx="200" cy="200" r="7" fill="#1858C8"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="colecao">
+    <div class="container">
+      <div class="sec-header center reveal">
+        <div class="eyebrow" style="justify-content:center">Nossa Cole&#xe7;&#xe3;o</div>
+        <h2 class="s-title" style="margin-top:16px">Arma&#xe7;&#xf5;es &amp; Lentes<br/>para todos os estilos</h2>
+        <p class="s-sub" style="margin-top:12px">Explore nossa sele&#xe7;&#xe3;o premium. Consulte disponibilidade e pre&#xe7;os pelo WhatsApp ou visite uma de nossas unidades em Londrina.</p>
+      </div>
+      <div class="col-grid">
+        <div class="col-card reveal reveal-delay-1">
+          <div class="col-visual" style="background:linear-gradient(135deg,#0f2a6e,#1858C8)">
+            <svg width="200" viewBox="0 0 280 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="10" y="18" width="110" height="80" rx="24" stroke="white" stroke-width="8" fill="rgba(255,255,255,0.07)"/>
+              <rect x="160" y="18" width="110" height="80" rx="24" stroke="white" stroke-width="8" fill="rgba(255,255,255,0.07)"/>
+              <path d="M120 58 C126 50 134 46 140 46 C146 46 154 50 160 58" stroke="white" stroke-width="8" fill="none" stroke-linecap="round"/>
+              <path d="M10 38 L0 30" stroke="white" stroke-width="8" stroke-linecap="round"/>
+              <path d="M270 38 L280 30" stroke="white" stroke-width="8" stroke-linecap="round"/>
+              <rect x="28" y="34" width="74" height="48" rx="14" stroke="rgba(255,255,255,0.2)" stroke-width="2" fill="none"/>
+              <rect x="178" y="34" width="74" height="48" rx="14" stroke="rgba(255,255,255,0.2)" stroke-width="2" fill="none"/>
+              <ellipse cx="52" cy="46" rx="14" ry="9" fill="rgba(255,255,255,0.12)" transform="rotate(-15 52 46)"/>
+              <ellipse cx="202" cy="46" rx="14" ry="9" fill="rgba(255,255,255,0.12)" transform="rotate(-15 202 46)"/>
+            </svg>
+            <div class="col-badge">+500 modelos</div>
+          </div>
+          <div class="col-body">
+            <h3>Arma&#xe7;&#xf5;es de Grau</h3>
+            <p>Centenas de modelos nacionais e importados. Encontre a arma&#xe7;&#xe3;o perfeita para o seu rosto e estilo de vida.</p>
+            <ul class="col-features">
+              <li>Marcas nacionais e importadas</li>
+              <li>Todos os formatos de rosto</li>
+              <li>Titanium, acetato e metal</li>
+            </ul>
+            <a href="https://wa.me/5543988401870?text=Ol%C3%A1%21+Gostaria+de+ver+as+arma%C3%A7%C3%B5es+dispon%C3%ADveis." target="_blank" class="btn btn-primary" style="justify-content:center">Consultar pelo WhatsApp</a>
+          </div>
+        </div>
+        <div class="col-card reveal reveal-delay-2">
+          <div class="col-visual" style="background:linear-gradient(135deg,#030d1f,#081a38)">
+            <svg width="130" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="100" cy="80" r="65" stroke="white" stroke-width="8" fill="rgba(255,255,255,0.05)"/>
+              <circle cx="100" cy="80" r="44" stroke="rgba(255,255,255,0.3)" stroke-width="4" fill="none" stroke-dasharray="6 4"/>
+              <circle cx="100" cy="80" r="24" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.6)" stroke-width="4"/>
+              <circle cx="100" cy="80" r="9" fill="white"/>
+              <ellipse cx="110" cy="70" rx="7" ry="5" fill="rgba(255,255,255,0.7)" transform="rotate(-20 110 70)"/>
+            </svg>
+            <div class="col-badge" style="background:var(--mist);color:var(--navy)">Varilux</div>
+          </div>
+          <div class="col-body">
+            <h3>Lentes de Grau</h3>
+            <p>Lentes premium, progressivas Varilux, antirreflexo e fotossens&#xed;veis das maiores fabricantes do mundo.</p>
+            <ul class="col-features">
+              <li>Progressivas Varilux</li>
+              <li>Antirreflexo e fotossens&#xed;vel</li>
+              <li>Alta performance visual</li>
+            </ul>
+            <a href="https://wa.me/5543988401870?text=Ol%C3%A1%21+Gostaria+de+saber+mais+sobre+as+lentes+dispon%C3%ADveis." target="_blank" class="btn btn-primary" style="justify-content:center">Consultar pelo WhatsApp</a>
+          </div>
+        </div>
+        <div class="col-card reveal reveal-delay-3">
+          <div class="col-visual" style="background:linear-gradient(135deg,#0f3d91,#1858C8)">
+            <svg width="160" viewBox="0 0 200 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="100" cy="68" rx="62" ry="42" stroke="white" stroke-width="8" fill="rgba(255,255,255,0.07)"/>
+              <ellipse cx="100" cy="68" rx="42" ry="26" stroke="rgba(255,255,255,0.28)" stroke-width="3" fill="none"/>
+              <ellipse cx="100" cy="62" rx="18" ry="12" fill="rgba(255,255,255,0.13)" transform="rotate(-15 100 62)"/>
+              <line x1="38" y1="26" x2="18" y2="10" stroke="rgba(255,255,255,0.6)" stroke-width="5" stroke-linecap="round"/>
+              <line x1="162" y1="26" x2="182" y2="10" stroke="rgba(255,255,255,0.6)" stroke-width="5" stroke-linecap="round"/>
+              <line x1="100" y1="26" x2="100" y2="8" stroke="rgba(255,255,255,0.6)" stroke-width="5" stroke-linecap="round"/>
+            </svg>
+            <div class="col-badge">&#xd3;culos de Sol</div>
+          </div>
+          <div class="col-body">
+            <h3>&#xd3;culos de Sol</h3>
+            <p>Prote&#xe7;&#xe3;o UV total com estilo. Cole&#xe7;&#xf5;es das maiores marcas nacionais e internacionais para todos os gostos.</p>
+            <ul class="col-features">
+              <li>Prote&#xe7;&#xe3;o UV 400</li>
+              <li>Marcas premium</li>
+              <li>Lentes polarizadas</li>
+            </ul>
+            <a href="https://wa.me/5543988401870?text=Ol%C3%A1%21+Gostaria+de+ver+os+%C3%B3culos+de+sol+dispon%C3%ADveis." target="_blank" class="btn btn-primary" style="justify-content:center">Consultar pelo WhatsApp</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-cta-note reveal" style="margin-top:52px">
+        <p>Prefere ver pessoalmente? <a href="#lojas">Visite uma de nossas lojas</a> ou <a href="#cta">agende uma consulta</a> &#x2014; sem compromisso.<br/>Em breve: <strong>loja online</strong> com cat&#xe1;logo completo e compra direta. <a href="loja.html">Ver pr&#xe9;via</a></p>
+      </div>
+    </div>
+  </section>
+  <section id="servicos">
+    <div class="container">
+      <div class="sec-header reveal">
+        <div class="eyebrow">O que oferecemos</div>
+        <h2 class="s-title" style="margin-top:16px">Tudo para a sua vis&#xe3;o</h2>
+        <p class="s-sub" style="margin-top:12px">Do exame &#xe0; montagem final, cuidamos de cada detalhe para que voc&#xea; enxergue com conforto e estilo.</p>
+      </div>
+    </div>
+    <div style="max-width:1200px;margin:0 auto">
+      <div class="svc-grid">
+        <div class="svc-card reveal reveal-delay-1">
+          <div class="svc-num">01</div>
+          <div class="svc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/></svg></div>
+          <h3>&#xd3;culos de Grau</h3>
+          <p>Arma&#xe7;&#xf5;es nacionais e importadas com as melhores lentes do mercado, adaptadas ao seu estilo de vida.</p>
+        </div>
+        <div class="svc-card reveal reveal-delay-2">
+          <div class="svc-num">02</div>
+          <div class="svc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg></div>
+          <h3>&#xd3;culos de Sol</h3>
+          <p>Prote&#xe7;&#xe3;o UV total aliada ao estilo. Cole&#xe7;&#xf5;es das maiores marcas nacionais e internacionais.</p>
+        </div>
+        <div class="svc-card reveal reveal-delay-3">
+          <div class="svc-num">03</div>
+          <div class="svc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg></div>
+          <h3>Lentes de Contato</h3>
+          <p>Lentes descart&#xe1;veis, coloridas e para astigmatismo. Orienta&#xe7;&#xe3;o completa para uso correto e seguro.</p>
+        </div>
+        <div class="svc-card reveal reveal-delay-4">
+          <div class="svc-num">04</div>
+          <div class="svc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+          <h3>Exame de Vista</h3>
+          <p>Avalia&#xe7;&#xe3;o oftalmol&#xf3;gica completa com equipamentos modernos e profissionais qualificados.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="diferenciais">
+    <div class="diff-bg"></div>
+    <div class="container">
+      <div class="diff-inner">
+        <div class="diff-lhs reveal">
+          <div class="eyebrow">Por que nos escolher</div>
+          <h2 class="s-title" style="margin-top:16px;color:white">Qualidade que voc&#xea;<br/>pode enxergar</h2>
+          <p class="s-sub" style="margin-top:12px;color:rgba(255,255,255,.5);max-width:360px">H&#xe1; mais de uma d&#xe9;cada levando clareza visual e bem-estar para a vida dos londrinenses com atendimento personalizado e tecnologia de ponta.</p>
+          <div class="diff-varilux">
+            <div class="varilux-badge">Varilux<br/>Especialista</div>
+            <p>Somos uma das poucas &#xf3;ticas de Londrina <strong>certificadas como Varilux Especialista</strong> &#x2014; a maior refer&#xea;ncia em lentes progressivas do mundo.</p>
+          </div>
+        </div>
+        <div class="diff-rhs reveal">
+          <div class="diff-item">
+            <div class="diff-num">01</div>
+            <div><h3>Atendimento Personalizado</h3><p>Cada cliente &#xe9; &#xfa;nico. Entendemos seu estilo de vida e indicamos a solu&#xe7;&#xe3;o visual perfeita para voc&#xea;.</p></div>
+          </div>
+          <div class="diff-item">
+            <div class="diff-num">02</div>
+            <div><h3>Tecnologia de Lentes Premium</h3><p>Parceiros das maiores fabricantes. Lentes antirreflexo, fotossens&#xed;veis e progressivas de alta performance.</p></div>
+          </div>
+          <div class="diff-item">
+            <div class="diff-num">03</div>
+            <div><h3>Equipe Especializada</h3><p>Optometristas e consultores treinados para oferecer o melhor diagn&#xf3;stico e a experi&#xea;ncia mais satisfat&#xf3;ria.</p></div>
+          </div>
+          <div class="diff-item">
+            <div class="diff-num">04</div>
+            <div><h3>Garantia e P&#xf3;s-Venda</h3><p>Adapta&#xe7;&#xe3;o garantida e suporte completo ap&#xf3;s a compra. Sua satisfa&#xe7;&#xe3;o &#xe9; nossa prioridade.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="lojas">
+    <div class="container">
+      <div class="sec-header reveal">
+        <div class="eyebrow">Nossas unidades</div>
+        <h2 class="s-title" style="margin-top:16px">Onde nos encontrar</h2>
+        <p class="s-sub" style="margin-top:12px">Duas unidades em Londrina para facilitar o seu acesso ao melhor atendimento &#xf3;tico da regi&#xe3;o.</p>
+      </div>
+      <div class="lojas-grid">
+        <div class="loja-card reveal reveal-delay-1">
+          <div class="loja-map" style="background:linear-gradient(135deg,#030d1f 0%,#0f2a6e 100%)">
+            <div class="loja-map-grid"></div>
+            <div class="loja-unit-tag">Unidade 1</div>
+            <div class="loja-pin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+          </div>
+          <div class="loja-body">
+            <h3>Shopping Com-Tour</h3>
+            <div class="loja-detail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>Av. Tiradentes, 1.241 &#x2014; Jardim Shangrila-A, Londrina, PR</span></div>
+            <div class="loja-detail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Seg &#x2013; S&#xe1;b: 9h &#xe0;s 21h &nbsp;|&nbsp; Dom: 12h &#xe0;s 20h</span></div>
+            <div class="loja-detail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.86 9.4 19.79 19.79 0 01.81 3.8 2 2 0 012.8 1.6h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 9.91a16 16 0 006 6l.97-.97a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 17.27z"/></svg><span>(43) 98840-1870</span></div>
+            <div class="loja-actions">
+              <a href="https://wa.me/5543988401870" target="_blank" class="btn-loja btn-loja-primary"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>WhatsApp</a>
+              <a href="https://maps.google.com/?q=Shopping+Com-Tour+Londrina" target="_blank" class="btn-loja btn-loja-ghost"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Como chegar</a>
+            </div>
+          </div>
+        </div>
+        <div class="loja-card reveal reveal-delay-2">
+          <div class="loja-map" style="background:linear-gradient(135deg,#050e22 0%,#0f3d91 100%)">
+            <div class="loja-map-grid"></div>
+            <div class="loja-unit-tag">Unidade 2</div>
+            <div class="loja-pin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+          </div>
+          <div class="loja-body">
+            <h3>Edif&#xed;cio Square Garden</h3>
+            <div class="loja-detail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>Londrina, PR &#x2014; Edif&#xed;cio Square Garden</span></div>
+            <div class="loja-detail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Seg &#x2013; Sex: 8h30 &#xe0;s 18h &nbsp;|&nbsp; S&#xe1;b: 8h30 &#xe0;s 13h</span></div>
+            <div class="loja-detail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.86 9.4 19.79 19.79 0 01.81 3.8 2 2 0 012.8 1.6h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 9.91a16 16 0 006 6l.97-.97a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 17.27z"/></svg><span>(43) 98839-9646</span></div>
+            <div class="loja-actions">
+              <a href="https://wa.me/5543988399646" target="_blank" class="btn-loja btn-loja-primary"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>WhatsApp</a>
+              <a href="https://maps.google.com/?q=Edificio+Square+Garden+Londrina" target="_blank" class="btn-loja btn-loja-ghost"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Como chegar</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="depoimentos">
+    <div class="container">
+      <div class="sec-header center reveal">
+        <div class="eyebrow" style="justify-content:center">O que dizem nossos clientes</div>
+        <h2 class="s-title" style="margin-top:16px">Quem enxerga bem,<br/>fala bem</h2>
+        <p class="s-sub" style="margin-top:12px">A satisfa&#xe7;&#xe3;o dos nossos clientes &#xe9; o nosso maior reconhecimento.</p>
+      </div>
+      <div class="dep-grid">
+        <div class="dep-card reveal reveal-delay-1">
+          <div class="dep-stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" fill="currentColor"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" fill="currentColor"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" fill="currentColor"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" fill="currentColor"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" fill="currentColor"/></svg></div>
+          <p class="dep-quote">&#x201c;Uso &#xf3;culos h&#xe1; 20 anos e nunca fui t&#xe3;o bem atendida. A equipe da Visiomais entendeu exatamente o que eu precisava e as lentes Varilux transformaram minha qualidade de vida.&#x201d;</p>
+          <div class="dep-author"><div class="dep-avatar">A</div><div><div class="dep-name">Ana Paula Mendon&#xe7;a</div><div class="dep-since">Cliente h&#xe1; 3 anos</div></div></div>
+        </div>
+        <div class="dep-card reveal reveal-delay-2">
+          <div class="dep-stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" fill="currentColor"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" fill="currentColor"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" fill="currentColor"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" fill="currentColor"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" fill="currentColor"/></svg></div>
+          <p class="dep-quote">&#x201c;Comprei meus &#xf3;culos no Shopping Com-Tour e o processo foi incr&#xed;vel. Eles t&#xea;m um acervo enorme e o atendimento &#xe9; muito paciente. Sa&#xed; com o &#xf3;culos perfeito para meu rosto.&#x201d;</p>
+          <div class="dep-author"><div class="dep-avatar" style="background:linear-gradient(135deg,#0f3d91,#2a6edf)">R</div><div><div class="dep-name">Roberto Carvalho</div><div class="dep-since">Cliente h&#xe1; 5 anos</div></div></div>
+        </div>
+        <div class="dep-card reveal reveal-delay-3">
+          <div class="dep-stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" fill="currentColor"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" fill="currentColor"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" fill="currentColor"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" fill="currentColor"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" fill="currentColor"/></svg></div>
+          <p class="dep-quote">&#x201c;Minha m&#xe3;e tem dificuldade com progressivos e ficou t&#xe3;o satisfeita com as lentes Varilux que indicou para toda a fam&#xed;lia. O p&#xf3;s-venda da Visiomais &#xe9; excepcional.&#x201d;</p>
+          <div class="dep-author"><div class="dep-avatar" style="background:linear-gradient(135deg,#1858C8,#5b9fff)">M</div><div><div class="dep-name">Mariana Souza</div><div class="dep-since">Cliente h&#xe1; 2 anos</div></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="cta">
+    <div class="cta-glow"></div>
+    <div class="container">
+      <div class="cta-inner reveal">
+        <div class="cta-eyebrow"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>&ensp;Agendamento f&#xe1;cil e r&#xe1;pido</div>
+        <h2>Agende sua consulta hoje</h2>
+        <p>Entre em contato pelo WhatsApp ou Instagram e garanta seu hor&#xe1;rio em uma das nossas duas unidades em Londrina.</p>
+        <div class="cta-actions">
+          <a href="https://wa.me/5543988401870" target="_blank" class="btn btn-wpp"><svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>Chamar no WhatsApp</a>
+          <a href="https://instagram.com/oticavisiomais" target="_blank" class="btn btn-ig"><svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>@oticavisiomais</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <footer id="footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="#" class="logo">
+            <svg class="logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="48" fill="#1858C8"/><circle cx="50" cy="50" r="38" stroke="white" stroke-width="2.5" fill="none" stroke-dasharray="5 4"/><circle cx="50" cy="50" r="29" stroke="white" stroke-width="2.5" fill="none" stroke-dasharray="4 3"/><circle cx="50" cy="50" r="20" stroke="white" stroke-width="2.5" fill="none"/><circle cx="50" cy="50" r="11" fill="white"/><circle cx="50" cy="50" r="6" fill="#1858C8"/><circle cx="53" cy="47" r="2.5" fill="white"/><path d="M14 50 Q20 44 26 50" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M74 50 Q80 44 86 50" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
+            <div class="logo-wordmark"><span class="logo-name">Visiomais</span><span class="logo-sub">&#xd3;tica</span></div>
+          </a>
+          <p>Ajudamos voc&#xea; a enxergar melhor atrav&#xe9;s dos seus &#xf3;culos. Varilux Especialista em Londrina com duas unidades para melhor atend&#xea;-lo.</p>
+          <div class="footer-social">
+            <a href="https://instagram.com/oticavisiomais" target="_blank" class="social-btn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg></a>
+            <a href="https://wa.me/5543988401870" target="_blank" class="social-btn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg></a>
+          </div>
+        </div>
+        <div class="footer-col"><h4>Servi&#xe7;os</h4><ul><li><a href="#servicos">&#xd3;culos de Grau</a></li><li><a href="#servicos">&#xd3;culos de Sol</a></li><li><a href="#servicos">Lentes de Contato</a></li><li><a href="#servicos">Exame de Vista</a></li></ul></div>
+        <div class="footer-col"><h4>Nossas Lojas</h4><ul><li><a href="#lojas">Shopping Com-Tour</a></li><li><a href="#lojas">Edif&#xed;cio Square Garden</a></li><li><a href="loja.html">Loja Online</a></li></ul></div>
+        <div class="footer-col"><h4>Contato</h4><ul><li><a href="https://wa.me/5543988401870" target="_blank">WhatsApp</a></li><li><a href="https://instagram.com/oticavisiomais" target="_blank">@oticavisiomais</a></li><li><a href="#cta">Agendar Consulta</a></li></ul></div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">&#xa9; 2026 <span>&#xd3;tica Visiomais</span> &#x2014; Todos os direitos reservados. Londrina, PR.</p>
+        <p class="footer-copy">Varilux Especialista Certificado</p>
+      </div>
+    </div>
+  </footer>
+  <script>
+    const hdr = document.getElementById('header');
+    window.addEventListener('scroll', () => hdr.classList.toggle('scrolled', window.scrollY > 40), {passive:true});
+    document.getElementById('hamburger').addEventListener('click', () => {
+      document.getElementById('mobileNav').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+    document.getElementById('mobileClose').addEventListener('click', closeMobile);
+    function closeMobile() {
+      document.getElementById('mobileNav').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    const obs = new IntersectionObserver(entries => entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+    }), {threshold:.1, rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  </script>
+</body>
+</html>
