@@ -107,9 +107,9 @@
     .tryon-title svg{width:20px;height:20px}
     .tryon-close{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:white;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center;transition:all .3s;backdrop-filter:blur(4px)}
     .tryon-close:hover{background:rgba(255,255,255,.3);transform:scale(1.1)}
-    .tryon-container{position:relative;width:100%;height:100%;max-width:640px;max-height:480px;overflow:hidden;border-radius:16px}
-    .tryon-container video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
-    .tryon-container canvas{position:absolute;top:0;left:0;width:100%;height:100%;transform:scaleX(-1)}
+    .tryon-container{position:relative;width:100%;max-width:640px;aspect-ratio:4/3;overflow:hidden;border-radius:16px}
+    .tryon-container video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+    .tryon-container canvas{position:absolute;top:0;left:0;width:100%;height:100%;transform:scaleX(-1);pointer-events:none}
     .tryon-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;gap:16px;z-index:5}
     .tryon-loading.hidden{display:none}
     .tryon-spinner{width:48px;height:48px;border:4px solid rgba(255,255,255,.2);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
@@ -609,11 +609,15 @@
     let tryonActive = false;
     let currentFacing = 'user';
 
-    // Glasses image overlay - uses real glasses photo PNG
+    // Glasses image overlay
     const glassesImg = new Image();
     let glassesImgLoaded = false;
     glassesImg.onload = () => { glassesImgLoaded = true; };
     glassesImg.src = 'glasses-tryon.png';
+
+    // Smooth tracking state
+    let smoothCx = 0, smoothCy = 0, smoothAngle = 0, smoothW = 0;
+    const SMOOTH = 0.35; // lower = smoother (0-1)
 
     function openTryOn() {
       const modal = document.getElementById('tryonModal');
@@ -696,62 +700,69 @@
 
     function onFaceMeshResults(results, canvas) {
       const ctx = canvas.getContext('2d');
-      canvas.width = results.image.width;
-      canvas.height = results.image.height;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const vw = results.image.width;
+      const vh = results.image.height;
 
-      if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) return;
+      // Match canvas internal resolution to video
+      if (canvas.width !== vw || canvas.height !== vh) {
+        canvas.width = vw;
+        canvas.height = vh;
+      }
+      ctx.clearRect(0, 0, vw, vh);
 
-      const landmarks = results.multiFaceLandmarks[0];
-      const w = canvas.width;
-      const h = canvas.height;
-
-      // Key landmarks
-      const leftEyeOuter = landmarks[33];
-      const rightEyeOuter = landmarks[263];
-      const noseBridge = landmarks[168];
-      const leftTemple = landmarks[234];
-      const rightTemple = landmarks[454];
-
-      // Use eye-to-eye width for glasses sizing
-      const eyeWidth = Math.hypot(
-        (rightEyeOuter.x - leftEyeOuter.x) * w,
-        (rightEyeOuter.y - leftEyeOuter.y) * h
-      );
-
-      // Center point between eyes at nose bridge height
-      const cx = ((leftEyeOuter.x + rightEyeOuter.x) / 2) * w;
-      const cy = noseBridge.y * h;
-
-      // Rotation angle
-      const angle = Math.atan2(
-        (rightEyeOuter.y - leftEyeOuter.y) * h,
-        (rightEyeOuter.x - leftEyeOuter.x) * w
-      );
-
+      if (!results.multiFaceLandmarks || !results.multiFaceLandmarks.length) return;
       if (!glassesImgLoaded) return;
 
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.rotate(angle);
+      const lm = results.multiFaceLandmarks[0];
 
-      // Crop only the front part of the glasses (exclude temple arms)
-      // Source image: crop from 8% to 92% width to remove side temples
+      // Key face points (normalized 0-1)
+      const leO = lm[33];   // left eye outer corner
+      const reO = lm[263];  // right eye outer corner
+      const nose = lm[168]; // nose bridge
+      const lT = lm[234];   // left temple
+      const rT = lm[454];   // right temple
+      const leTop = lm[159]; // left eye top
+      const reTop = lm[386]; // right eye top
+
+      // Eye center in pixels
+      const rawCx = ((leO.x + reO.x) / 2) * vw;
+      const rawCy = ((leO.y + reO.y) / 2 * 0.5 + nose.y * 0.5) * vh;
+
+      // Eye-to-eye distance for sizing
+      const rawEyeW = Math.hypot((reO.x - leO.x) * vw, (reO.y - leO.y) * vh);
+
+      // Head rotation angle
+      const rawAngle = Math.atan2(
+        (reO.y - leO.y) * vh,
+        (reO.x - leO.x) * vw
+      );
+
+      // Apply smoothing for natural movement
+      smoothCx += (rawCx - smoothCx) * SMOOTH;
+      smoothCy += (rawCy - smoothCy) * SMOOTH;
+      smoothAngle += (rawAngle - smoothAngle) * SMOOTH;
+      smoothW += (rawEyeW - smoothW) * SMOOTH;
+
+      // Glasses dimensions
+      const drawW = smoothW * 1.75;
+      const imgAspect = glassesImg.naturalWidth / glassesImg.naturalHeight;
+      const drawH = drawW / imgAspect;
+
+      // Crop temple arms from source image (keep 10%-90% of width)
       const srcW = glassesImg.naturalWidth;
       const srcH = glassesImg.naturalHeight;
-      const cropX = srcW * 0.08;
-      const cropW = srcW * 0.84;
-      const cropH = srcH;
+      const cropMargin = srcW * 0.08;
+      const cropW = srcW - cropMargin * 2;
 
-      // Scale glasses to match eye width with some padding
-      const drawW = eyeWidth * 1.6;
-      const drawH = drawW * (cropH / cropW);
+      ctx.save();
+      ctx.translate(smoothCx, smoothCy);
+      ctx.rotate(smoothAngle);
 
-      // Draw cropped glasses centered on face
+      // Draw glasses centered on eyes
       ctx.drawImage(
         glassesImg,
-        cropX, 0, cropW, cropH,           // source crop
-        -drawW / 2, -drawH * 0.42, drawW, drawH  // destination
+        cropMargin, 0, cropW, srcH,
+        -drawW / 2, -drawH * 0.45, drawW, drawH
       );
 
       ctx.restore();
