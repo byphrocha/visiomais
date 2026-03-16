@@ -603,35 +603,39 @@
       evt.currentTarget.classList.add('active');
     }
 
-    /* ========== VIRTUAL TRY-ON — Single Canvas Rendering ========== */
+    /* ========== VIRTUAL TRY-ON — Landmark-Based Drawing ========== */
     /*
-     * KEY FIX: We render EVERYTHING (video feed + glasses overlay) on a
-     * single <canvas>. This eliminates the misalignment caused by having
-     * separate video and canvas elements with different object-fit scaling.
-     * This is how Meta, Warby Parker, and other pro AR try-ons work.
+     * Instead of overlaying a single PNG image, we DRAW the glasses
+     * directly onto the canvas using face landmarks as anchor points.
+     * Each lens is positioned independently around each eye, and the
+     * bridge connects them. This means the glasses naturally deform
+     * and follow the face in 3D — no misalignment possible.
      */
     let tryonCamera = null;
     let faceMesh = null;
     let tryonActive = false;
     let currentFacing = 'user';
 
-    // Glasses image overlay
-    const glassesImg = new Image();
-    glassesImg.crossOrigin = 'anonymous';
-    let glassesImgLoaded = false;
-    glassesImg.onload = () => { glassesImgLoaded = true; };
-    glassesImg.src = 'glasses-tryon.png';
-
-    // Smoothing state
-    const S = { cx:0, cy:0, w:0, roll:0, init:false };
-    const LERP = 0.35;
+    // Smoothing state — per-point smoothing for accuracy
+    const SM = {
+      leO:{x:0,y:0}, reO:{x:0,y:0},
+      leI:{x:0,y:0}, reI:{x:0,y:0},
+      leUp:{x:0,y:0}, reUp:{x:0,y:0},
+      leDn:{x:0,y:0}, reDn:{x:0,y:0},
+      lT:{x:0,y:0}, rT:{x:0,y:0},
+      nb:{x:0,y:0},
+      init: false
+    };
+    const LERP = 0.5;
     function lerp(a, b, t) { return a + (b - a) * t; }
+    function lerpPt(s, r) { s.x = lerp(s.x, r.x, LERP); s.y = lerp(s.y, r.y, LERP); }
+    function setPt(s, r) { s.x = r.x; s.y = r.y; }
 
     function openTryOn() {
       document.getElementById('tryonModal').classList.add('active');
       document.body.style.overflow = 'hidden';
       tryonActive = true;
-      S.init = false;
+      SM.init = false;
       initTryOn();
     }
 
@@ -698,98 +702,253 @@
     function onFaceMeshResults(results) {
       const canvas = document.getElementById('tryonCanvas');
       const ctx = canvas.getContext('2d');
-      const video = document.getElementById('tryonVideo');
       const vw = results.image.width;
       const vh = results.image.height;
 
-      // Match canvas to actual video resolution
       if (canvas.width !== vw || canvas.height !== vh) {
         canvas.width = vw;
         canvas.height = vh;
       }
 
-      // ---- STEP 1: Draw mirrored video frame onto canvas ----
+      // Draw mirrored video
       ctx.save();
       ctx.translate(vw, 0);
       ctx.scale(-1, 1);
       ctx.drawImage(results.image, 0, 0, vw, vh);
       ctx.restore();
 
-      // ---- STEP 2: Draw glasses overlay if face detected ----
       if (!results.multiFaceLandmarks || !results.multiFaceLandmarks.length) {
-        S.init = false;
+        SM.init = false;
         return;
       }
-      if (!glassesImgLoaded) return;
 
       const lm = results.multiFaceLandmarks[0];
 
+      // Helper: mirrored pixel coordinates
+      function px(idx) {
+        return { x: vw - lm[idx].x * vw, y: lm[idx].y * vh };
+      }
+
       /*
-       * MediaPipe FaceMesh landmarks (468 points):
-       * 33  = left eye outer corner (person's left)
-       * 263 = right eye outer corner (person's right)
-       * 133 = left eye inner corner
-       * 362 = right eye inner corner
-       * 6   = nose bridge top (between eyes)
-       * 168 = forehead bridge
-       * 234 = left temple
-       * 454 = right temple
+       * Key landmarks for glasses:
+       * 33  = left eye outer corner     263 = right eye outer corner
+       * 133 = left eye inner corner     362 = right eye inner corner
+       * 159 = left eye top              386 = right eye top
+       * 145 = left eye bottom           374 = right eye bottom
+       * 234 = left temple (ear)         454 = right temple (ear)
+       * 6   = nose bridge (between eyes)
+       * 127 = left cheekbone outer      356 = right cheekbone outer
        *
-       * IMPORTANT: Landmarks are in normalized [0,1] coordinates
-       * relative to the ORIGINAL (non-mirrored) video frame.
-       * Since we mirror the video on canvas, we must also mirror
-       * the x-coordinates: mirroredX = vw - (lm.x * vw)
+       * After mirroring: person's left → screen right, person's right → screen left
        */
 
-      // Helper: get mirrored pixel coordinates
-      function px(idx) {
-        return {
-          x: vw - lm[idx].x * vw,  // mirror X
-          y: lm[idx].y * vh
-        };
-      }
+      const raw = {
+        leO: px(33),   reO: px(263),
+        leI: px(133),  reI: px(362),
+        leUp: px(159), reUp: px(386),
+        leDn: px(145), reDn: px(374),
+        lT: px(234),   rT: px(454),
+        nb: px(6)
+      };
 
-      const leO = px(33);   // left eye outer (now on screen-right after mirror)
-      const reO = px(263);  // right eye outer (now on screen-left after mirror)
-      const leI = px(133);  // left eye inner
-      const reI = px(362);  // right eye inner
-      const nb  = px(6);    // nose bridge
-
-      // ---- Center point: bridge of nose ----
-      const rawCx = nb.x;
-      const rawCy = nb.y;
-
-      // ---- Width: outer eye corner distance + padding ----
-      const eyeDist = Math.hypot(reO.x - leO.x, reO.y - leO.y);
-      const rawW = eyeDist * 1.6;
-
-      // ---- Roll: angle between outer eye corners ----
-      const rawRoll = Math.atan2(leO.y - reO.y, leO.x - reO.x);
-
-      // ---- Smooth values ----
-      if (!S.init) {
-        S.cx = rawCx; S.cy = rawCy;
-        S.w = rawW; S.roll = rawRoll;
-        S.init = true;
+      // Smooth all points
+      if (!SM.init) {
+        for (const k in raw) setPt(SM[k], raw[k]);
+        SM.init = true;
       } else {
-        S.cx   = lerp(S.cx, rawCx, LERP);
-        S.cy   = lerp(S.cy, rawCy, LERP);
-        S.w    = lerp(S.w, rawW, LERP);
-        S.roll = lerp(S.roll, rawRoll, LERP);
+        for (const k in raw) lerpPt(SM[k], raw[k]);
       }
 
-      // ---- Draw glasses ----
-      const drawW = S.w;
-      const imgAspect = glassesImg.naturalWidth / glassesImg.naturalHeight;
-      const drawH = drawW / imgAspect;
+      // ---- DRAW CLUBMASTER GLASSES ----
+      const p = SM;
 
-      // The glasses bridge/nose pad sits at roughly 50% from the top of the image
-      const bridgeOffsetY = drawH * 0.48;
+      // Eye measurements
+      const leftEyeW = Math.hypot(p.leO.x - p.leI.x, p.leO.y - p.leI.y);
+      const rightEyeW = Math.hypot(p.reO.x - p.reI.x, p.reO.y - p.reI.y);
+      const leftEyeH = Math.hypot(p.leUp.x - p.leDn.x, p.leUp.y - p.leDn.y);
+      const rightEyeH = Math.hypot(p.reUp.x - p.reDn.x, p.reUp.y - p.reDn.y);
+
+      // Lens padding (how much bigger than eye opening)
+      const padX = 0.45;
+      const padY = 0.7;
+
+      // Left lens dimensions & center
+      const llW = leftEyeW * (1 + padX * 2);
+      const llH = leftEyeH * (1 + padY * 2);
+      const llCx = (p.leO.x + p.leI.x) / 2;
+      const llCy = (p.leUp.y + p.leDn.y) / 2;
+
+      // Right lens dimensions & center
+      const rlW = rightEyeW * (1 + padX * 2);
+      const rlH = rightEyeH * (1 + padY * 2);
+      const rlCx = (p.reO.x + p.reI.x) / 2;
+      const rlCy = (p.reUp.y + p.reDn.y) / 2;
+
+      // Frame thickness scales with face size
+      const faceW = Math.hypot(p.lT.x - p.rT.x, p.lT.y - p.rT.y);
+      const thick = Math.max(2, faceW * 0.006);
+      const browThick = thick * 2.5;
+
+      // Colors — Clubmaster style
+      const frameColor = '#2c1810';       // dark brown/tortoise
+      const metalColor = '#c0c0c0';       // silver metal
+      const browColor = '#1a0e08';        // dark browline
+      const lensColor = 'rgba(200,220,240,0.15)'; // very subtle lens tint
+
+      // Roll angle for tilt
+      const roll = Math.atan2(p.reO.y - p.leO.y, p.reO.x - p.leO.x);
+      // Reverse because after mirror, directions flip
+      const rollMirrored = -roll;
+
+      // Center of glasses for rotation
+      const gcx = (llCx + rlCx) / 2;
+      const gcy = (llCy + rlCy) / 2;
 
       ctx.save();
-      ctx.translate(S.cx, S.cy);
-      ctx.rotate(S.roll);
-      ctx.drawImage(glassesImg, -drawW / 2, -bridgeOffsetY, drawW, drawH);
+      ctx.translate(gcx, gcy);
+      ctx.rotate(rollMirrored);
+      ctx.translate(-gcx, -gcy);
+
+      // ---- LEFT LENS (screen-right, person's left) ----
+      // Bottom half: metal rim (semi-circle)
+      ctx.beginPath();
+      ctx.ellipse(llCx, llCy, llW/2, llH/2, 0, 0, Math.PI * 2);
+      ctx.fillStyle = lensColor;
+      ctx.fill();
+
+      // Metal lower rim
+      ctx.beginPath();
+      ctx.ellipse(llCx, llCy, llW/2, llH/2, 0, 0.1, Math.PI - 0.1);
+      ctx.strokeStyle = metalColor;
+      ctx.lineWidth = thick;
+      ctx.stroke();
+
+      // Browline (top half — thicker, dark)
+      ctx.beginPath();
+      ctx.ellipse(llCx, llCy, llW/2, llH/2, 0, Math.PI + 0.1, -0.1);
+      ctx.strokeStyle = browColor;
+      ctx.lineWidth = browThick;
+      ctx.stroke();
+
+      // Top accent line
+      ctx.beginPath();
+      ctx.ellipse(llCx, llCy, llW/2 + browThick*0.3, llH/2 + browThick*0.3, 0, Math.PI + 0.15, -0.15);
+      ctx.strokeStyle = frameColor;
+      ctx.lineWidth = thick * 0.5;
+      ctx.stroke();
+
+      // ---- RIGHT LENS (screen-left, person's right) ----
+      ctx.beginPath();
+      ctx.ellipse(rlCx, rlCy, rlW/2, rlH/2, 0, 0, Math.PI * 2);
+      ctx.fillStyle = lensColor;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.ellipse(rlCx, rlCy, rlW/2, rlH/2, 0, 0.1, Math.PI - 0.1);
+      ctx.strokeStyle = metalColor;
+      ctx.lineWidth = thick;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.ellipse(rlCx, rlCy, rlW/2, rlH/2, 0, Math.PI + 0.1, -0.1);
+      ctx.strokeStyle = browColor;
+      ctx.lineWidth = browThick;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.ellipse(rlCx, rlCy, rlW/2 + browThick*0.3, rlH/2 + browThick*0.3, 0, Math.PI + 0.15, -0.15);
+      ctx.strokeStyle = frameColor;
+      ctx.lineWidth = thick * 0.5;
+      ctx.stroke();
+
+      // ---- NOSE BRIDGE ----
+      ctx.beginPath();
+      ctx.moveTo(p.leI.x, p.leI.y);
+      ctx.quadraticCurveTo(p.nb.x, p.nb.y + llH * 0.15, p.reI.x, p.reI.y);
+      ctx.strokeStyle = metalColor;
+      ctx.lineWidth = thick;
+      ctx.stroke();
+
+      // ---- TEMPLES / ARMS ----
+      // Left temple: from outer eye corner toward ear
+      const lTempleEnd = {
+        x: p.lT.x + (p.lT.x - llCx) * 0.15,
+        y: p.lT.y
+      };
+      ctx.beginPath();
+      ctx.moveTo(p.leO.x + (p.leO.x - llCx) * 0.3, llCy - llH * 0.15);
+      ctx.lineTo(lTempleEnd.x, lTempleEnd.y - llH * 0.1);
+      ctx.strokeStyle = browColor;
+      ctx.lineWidth = thick * 1.5;
+      ctx.stroke();
+
+      // Temple tip (ear hook)
+      ctx.beginPath();
+      ctx.moveTo(lTempleEnd.x, lTempleEnd.y - llH * 0.1);
+      ctx.quadraticCurveTo(
+        lTempleEnd.x + (lTempleEnd.x - llCx) * 0.05,
+        lTempleEnd.y + llH * 0.1,
+        lTempleEnd.x - (p.leO.x - llCx) * 0.1,
+        lTempleEnd.y + llH * 0.3
+      );
+      ctx.strokeStyle = browColor;
+      ctx.lineWidth = thick * 1.2;
+      ctx.stroke();
+
+      // Right temple
+      const rTempleEnd = {
+        x: p.rT.x + (p.rT.x - rlCx) * 0.15,
+        y: p.rT.y
+      };
+      ctx.beginPath();
+      ctx.moveTo(p.reO.x + (p.reO.x - rlCx) * 0.3, rlCy - rlH * 0.15);
+      ctx.lineTo(rTempleEnd.x, rTempleEnd.y - rlH * 0.1);
+      ctx.strokeStyle = browColor;
+      ctx.lineWidth = thick * 1.5;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(rTempleEnd.x, rTempleEnd.y - rlH * 0.1);
+      ctx.quadraticCurveTo(
+        rTempleEnd.x + (rTempleEnd.x - rlCx) * 0.05,
+        rTempleEnd.y + rlH * 0.1,
+        rTempleEnd.x - (p.reO.x - rlCx) * 0.1,
+        rTempleEnd.y + rlH * 0.3
+      );
+      ctx.strokeStyle = browColor;
+      ctx.lineWidth = thick * 1.2;
+      ctx.stroke();
+
+      // ---- NOSE PADS (small details) ----
+      const padSize = thick * 1.5;
+      ctx.beginPath();
+      ctx.ellipse(p.nb.x - padSize*1.5, p.nb.y + llH*0.08, padSize, padSize*0.6, -0.3, 0, Math.PI*2);
+      ctx.fillStyle = metalColor;
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(p.nb.x + padSize*1.5, p.nb.y + rlH*0.08, padSize, padSize*0.6, 0.3, 0, Math.PI*2);
+      ctx.fillStyle = metalColor;
+      ctx.fill();
+
+      // ---- LENS REFLECTIONS (subtle) ----
+      ctx.globalAlpha = 0.08;
+      const reflGrad1 = ctx.createLinearGradient(llCx - llW/2, llCy - llH/2, llCx + llW/4, llCy + llH/2);
+      reflGrad1.addColorStop(0, 'white');
+      reflGrad1.addColorStop(1, 'transparent');
+      ctx.beginPath();
+      ctx.ellipse(llCx, llCy, llW/2 - thick, llH/2 - thick, 0, 0, Math.PI*2);
+      ctx.fillStyle = reflGrad1;
+      ctx.fill();
+
+      const reflGrad2 = ctx.createLinearGradient(rlCx - rlW/2, rlCy - rlH/2, rlCx + rlW/4, rlCy + rlH/2);
+      reflGrad2.addColorStop(0, 'white');
+      reflGrad2.addColorStop(1, 'transparent');
+      ctx.beginPath();
+      ctx.ellipse(rlCx, rlCy, rlW/2 - thick, rlH/2 - thick, 0, 0, Math.PI*2);
+      ctx.fillStyle = reflGrad2;
+      ctx.fill();
+
+      ctx.globalAlpha = 1.0;
       ctx.restore();
     }
 
@@ -809,7 +968,7 @@
         video.srcObject.getTracks().forEach(t => t.stop());
         video.srcObject = null;
       }
-      S.init = false;
+      SM.init = false;
       await initTryOn();
     }
 
