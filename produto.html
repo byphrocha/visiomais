@@ -107,9 +107,9 @@
     .tryon-title svg{width:20px;height:20px}
     .tryon-close{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:white;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center;transition:all .3s;backdrop-filter:blur(4px)}
     .tryon-close:hover{background:rgba(255,255,255,.3);transform:scale(1.1)}
-    .tryon-container{position:relative;width:100%;max-width:900px;aspect-ratio:16/9;overflow:hidden;border-radius:16px;box-shadow:0 0 60px rgba(0,0,0,.5)}
-    .tryon-container video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
-    .tryon-container canvas{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);pointer-events:none}
+    .tryon-container{position:relative;width:100%;max-width:900px;overflow:hidden;border-radius:16px;box-shadow:0 0 60px rgba(0,0,0,.5)}
+    .tryon-container video{position:absolute;top:0;left:0;width:0;height:0;opacity:0;pointer-events:none}
+    .tryon-container canvas{display:block;width:100%;height:auto}
     .tryon-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;gap:16px;z-index:5}
     .tryon-loading.hidden{display:none}
     .tryon-spinner{width:48px;height:48px;border:4px solid rgba(255,255,255,.2);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
@@ -603,35 +603,32 @@
       evt.currentTarget.classList.add('active');
     }
 
-    /* ========== VIRTUAL TRY-ON — Enhanced Face Tracking ========== */
+    /* ========== VIRTUAL TRY-ON — Single Canvas Rendering ========== */
+    /*
+     * KEY FIX: We render EVERYTHING (video feed + glasses overlay) on a
+     * single <canvas>. This eliminates the misalignment caused by having
+     * separate video and canvas elements with different object-fit scaling.
+     * This is how Meta, Warby Parker, and other pro AR try-ons work.
+     */
     let tryonCamera = null;
     let faceMesh = null;
     let tryonActive = false;
     let currentFacing = 'user';
 
-    // Glasses image overlay — real product photo
+    // Glasses image overlay
     const glassesImg = new Image();
     glassesImg.crossOrigin = 'anonymous';
     let glassesImgLoaded = false;
     glassesImg.onload = () => { glassesImgLoaded = true; };
     glassesImg.src = 'glasses-tryon.png';
 
-    // ---- Smoothing state (exponential moving average) ----
-    const S = {
-      cx: 0, cy: 0,       // center position
-      w: 0,                // glasses width
-      roll: 0,             // head roll
-      yaw: 0,              // head yaw (left-right turn)
-      pitch: 0,            // head pitch (up-down)
-      init: false
-    };
-    const LERP = 0.45;     // lower = smoother, higher = more responsive
-
+    // Smoothing state
+    const S = { cx:0, cy:0, w:0, roll:0, init:false };
+    const LERP = 0.35;
     function lerp(a, b, t) { return a + (b - a) * t; }
 
     function openTryOn() {
-      const modal = document.getElementById('tryonModal');
-      modal.classList.add('active');
+      document.getElementById('tryonModal').classList.add('active');
       document.body.style.overflow = 'hidden';
       tryonActive = true;
       S.init = false;
@@ -639,14 +636,10 @@
     }
 
     function closeTryOn() {
-      const modal = document.getElementById('tryonModal');
-      modal.classList.remove('active');
+      document.getElementById('tryonModal').classList.remove('active');
       document.body.style.overflow = '';
       tryonActive = false;
-      if (tryonCamera) {
-        tryonCamera.stop();
-        tryonCamera = null;
-      }
+      if (tryonCamera) { tryonCamera.stop(); tryonCamera = null; }
       const video = document.getElementById('tryonVideo');
       if (video.srcObject) {
         video.srcObject.getTracks().forEach(t => t.stop());
@@ -667,7 +660,6 @@
           document.getElementById('btnFlipCamera').style.display = 'flex';
         }
 
-        // Initialize FaceMesh with refined landmarks for accuracy
         if (!faceMesh) {
           faceMesh = new FaceMesh({
             locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
@@ -675,13 +667,12 @@
           faceMesh.setOptions({
             maxNumFaces: 1,
             refineLandmarks: true,
-            minDetectionConfidence: 0.6,
-            minTrackingConfidence: 0.6
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
           });
-          faceMesh.onResults((results) => onFaceMeshResults(results, canvas));
+          faceMesh.onResults(onFaceMeshResults);
         }
 
-        // Start camera with higher resolution for better tracking
         tryonCamera = new Camera(video, {
           onFrame: async () => {
             if (tryonActive && faceMesh) {
@@ -694,9 +685,6 @@
         });
         await tryonCamera.start();
 
-        canvas.width = video.videoWidth || 1280;
-        canvas.height = video.videoHeight || 720;
-
         loading.style.display = 'none';
       } catch (err) {
         loading.innerHTML = `<div class="tryon-error">
@@ -707,17 +695,27 @@
       }
     }
 
-    function onFaceMeshResults(results, canvas) {
+    function onFaceMeshResults(results) {
+      const canvas = document.getElementById('tryonCanvas');
       const ctx = canvas.getContext('2d');
+      const video = document.getElementById('tryonVideo');
       const vw = results.image.width;
       const vh = results.image.height;
 
+      // Match canvas to actual video resolution
       if (canvas.width !== vw || canvas.height !== vh) {
         canvas.width = vw;
         canvas.height = vh;
       }
-      ctx.clearRect(0, 0, vw, vh);
 
+      // ---- STEP 1: Draw mirrored video frame onto canvas ----
+      ctx.save();
+      ctx.translate(vw, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(results.image, 0, 0, vw, vh);
+      ctx.restore();
+
+      // ---- STEP 2: Draw glasses overlay if face detected ----
       if (!results.multiFaceLandmarks || !results.multiFaceLandmarks.length) {
         S.init = false;
         return;
@@ -726,157 +724,86 @@
 
       const lm = results.multiFaceLandmarks[0];
 
-      /* ================================================
-         KEY FACE LANDMARKS (MediaPipe FaceMesh 468+)
-         ================================================
-         33  = left eye outer corner
-         263 = right eye outer corner
-         133 = left eye inner corner
-         362 = right eye inner corner
-         6   = nose bridge (between the eyes)
-         168 = forehead center (above nose bridge)
-         1   = nose tip
-         234 = left temple (ear area)
-         454 = right temple (ear area)
-         10  = top of forehead
-         152 = chin bottom
-         NOTE: in selfie mode (mirrored video), left/right
-         in landmarks are anatomical (person's left/right)
-      */
+      /*
+       * MediaPipe FaceMesh landmarks (468 points):
+       * 33  = left eye outer corner (person's left)
+       * 263 = right eye outer corner (person's right)
+       * 133 = left eye inner corner
+       * 362 = right eye inner corner
+       * 6   = nose bridge top (between eyes)
+       * 168 = forehead bridge
+       * 234 = left temple
+       * 454 = right temple
+       *
+       * IMPORTANT: Landmarks are in normalized [0,1] coordinates
+       * relative to the ORIGINAL (non-mirrored) video frame.
+       * Since we mirror the video on canvas, we must also mirror
+       * the x-coordinates: mirroredX = vw - (lm.x * vw)
+       */
 
-      // -- Eye corners in pixel coordinates --
-      const leO = { x: lm[33].x * vw, y: lm[33].y * vh };   // left eye outer
-      const reO = { x: lm[263].x * vw, y: lm[263].y * vh };  // right eye outer
-      const leI = { x: lm[133].x * vw, y: lm[133].y * vh };  // left eye inner
-      const reI = { x: lm[362].x * vw, y: lm[362].y * vh };  // right eye inner
+      // Helper: get mirrored pixel coordinates
+      function px(idx) {
+        return {
+          x: vw - lm[idx].x * vw,  // mirror X
+          y: lm[idx].y * vh
+        };
+      }
 
-      // -- Nose bridge (where glasses rest) --
-      const nb = { x: lm[6].x * vw, y: lm[6].y * vh, z: lm[6].z };
+      const leO = px(33);   // left eye outer (now on screen-right after mirror)
+      const reO = px(263);  // right eye outer (now on screen-left after mirror)
+      const leI = px(133);  // left eye inner
+      const reI = px(362);  // right eye inner
+      const nb  = px(6);    // nose bridge
 
-      // -- Temples (for full glasses width) --
-      const lT = { x: lm[234].x * vw, y: lm[234].y * vh };
-      const rT = { x: lm[454].x * vw, y: lm[454].y * vh };
+      // ---- Center point: bridge of nose ----
+      const rawCx = nb.x;
+      const rawCy = nb.y;
 
-      // -- Forehead and chin for face proportions --
-      const fh = { x: lm[10].x * vw, y: lm[10].y * vh };
-      const chin = { x: lm[152].x * vw, y: lm[152].y * vh };
-      const noseTip = { x: lm[1].x * vw, y: lm[1].y * vh, z: lm[1].z };
+      // ---- Width: outer eye corner distance + padding ----
+      const eyeDist = Math.hypot(reO.x - leO.x, reO.y - leO.y);
+      const rawW = eyeDist * 1.6;
 
-      // ---- CALCULATE GLASSES POSITION ----
+      // ---- Roll: angle between outer eye corners ----
+      const rawRoll = Math.atan2(leO.y - reO.y, leO.x - reO.x);
 
-      // Center: midpoint between inner eye corners (bridge of nose area)
-      // Slight offset toward nose bridge landmark for vertical accuracy
-      const eyeMidX = (leI.x + reI.x) / 2;
-      const eyeMidY = (leI.y + reI.y) / 2;
-      const rawCx = eyeMidX * 0.5 + nb.x * 0.5;
-      const rawCy = eyeMidY * 0.6 + nb.y * 0.4;
-
-      // Width: use outer eye corner distance as reference, with proportional padding
-      const eyeOuterDist = Math.hypot(reO.x - leO.x, reO.y - leO.y);
-      // Glasses should extend ~30% beyond each outer eye corner
-      const rawW = eyeOuterDist * 1.55;
-
-      // Head roll (tilt) from eye corners
-      const rawRoll = Math.atan2(reO.y - leO.y, reO.x - leO.x);
-
-      // Head yaw (left-right rotation) estimated from nose position
-      // relative to eye midpoint — when nose is left of center, face turns left
-      const eyeCenterX = (leO.x + reO.x) / 2;
-      const noseOffsetX = (noseTip.x - eyeCenterX) / eyeOuterDist;
-      const rawYaw = noseOffsetX * 0.8; // Normalized yaw estimate
-
-      // Head pitch estimate from nose tip vs bridge vertical distance
-      const faceHeight = Math.hypot(chin.x - fh.x, chin.y - fh.y);
-      const noseToEyeV = (noseTip.y - nb.y) / faceHeight;
-      const rawPitch = (noseToEyeV - 0.22) * 2.0; // Centered around neutral
-
-      // ---- SMOOTH ALL VALUES ----
+      // ---- Smooth values ----
       if (!S.init) {
         S.cx = rawCx; S.cy = rawCy;
         S.w = rawW; S.roll = rawRoll;
-        S.yaw = rawYaw; S.pitch = rawPitch;
         S.init = true;
       } else {
-        S.cx = lerp(S.cx, rawCx, LERP);
-        S.cy = lerp(S.cy, rawCy, LERP);
-        S.w = lerp(S.w, rawW, LERP);
+        S.cx   = lerp(S.cx, rawCx, LERP);
+        S.cy   = lerp(S.cy, rawCy, LERP);
+        S.w    = lerp(S.w, rawW, LERP);
         S.roll = lerp(S.roll, rawRoll, LERP);
-        S.yaw = lerp(S.yaw, rawYaw, LERP);
-        S.pitch = lerp(S.pitch, rawPitch, LERP);
       }
 
-      // ---- DRAW GLASSES ----
+      // ---- Draw glasses ----
       const drawW = S.w;
       const imgAspect = glassesImg.naturalWidth / glassesImg.naturalHeight;
       const drawH = drawW / imgAspect;
 
-      // Vertical offset: the bridge/nose pad area is approximately
-      // at 45% from the top of the glasses image
-      const bridgeYRatio = 0.45;
-
-      // Horizontal skew for yaw (perspective effect)
-      // When face turns right, left side of glasses appears wider
-      const skewX = S.yaw * 0.15;
-
-      // Vertical squeeze for pitch
-      const scaleY = 1.0 - Math.abs(S.pitch) * 0.08;
+      // The glasses bridge/nose pad sits at roughly 50% from the top of the image
+      const bridgeOffsetY = drawH * 0.48;
 
       ctx.save();
       ctx.translate(S.cx, S.cy);
       ctx.rotate(S.roll);
-
-      // Apply perspective transform via skew
-      ctx.transform(1, skewX, 0, scaleY, 0, 0);
-
-      // Slight opacity variation based on confidence (always near 1)
-      ctx.globalAlpha = 0.97;
-
-      ctx.drawImage(
-        glassesImg,
-        -drawW / 2,
-        -drawH * bridgeYRatio,
-        drawW,
-        drawH
-      );
+      ctx.drawImage(glassesImg, -drawW / 2, -bridgeOffsetY, drawW, drawH);
       ctx.restore();
     }
 
     function capturePhoto() {
-      const video = document.getElementById('tryonVideo');
-      const overlayCanvas = document.getElementById('tryonCanvas');
-
-      const tempCanvas = document.createElement('canvas');
-      tempCanvas.width = overlayCanvas.width;
-      tempCanvas.height = overlayCanvas.height;
-      const tctx = tempCanvas.getContext('2d');
-
-      // Draw mirrored video
-      tctx.save();
-      tctx.translate(tempCanvas.width, 0);
-      tctx.scale(-1, 1);
-      tctx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
-      tctx.restore();
-
-      // Draw overlay (mirrored to match)
-      tctx.save();
-      tctx.translate(tempCanvas.width, 0);
-      tctx.scale(-1, 1);
-      tctx.drawImage(overlayCanvas, 0, 0);
-      tctx.restore();
-
-      // Download
+      const canvas = document.getElementById('tryonCanvas');
       const link = document.createElement('a');
       link.download = 'visiomais-provador-virtual.png';
-      link.href = tempCanvas.toDataURL('image/png');
+      link.href = canvas.toDataURL('image/png');
       link.click();
     }
 
     async function flipCamera() {
       currentFacing = currentFacing === 'user' ? 'environment' : 'user';
-      if (tryonCamera) {
-        tryonCamera.stop();
-        tryonCamera = null;
-      }
+      if (tryonCamera) { tryonCamera.stop(); tryonCamera = null; }
       const video = document.getElementById('tryonVideo');
       if (video.srcObject) {
         video.srcObject.getTracks().forEach(t => t.stop());
@@ -886,7 +813,6 @@
       await initTryOn();
     }
 
-    // Close modal on Escape key
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && tryonActive) closeTryOn();
     });
