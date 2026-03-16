@@ -719,21 +719,21 @@
       const leftEyeTop = landmarks[159];
       const leftEyeBottom = landmarks[145];
 
-      // Calculate glasses dimensions
+      // Calculate glasses dimensions using temple-to-temple for full width
+      const templeWidth = Math.hypot(
+        (rightTemple.x - leftTemple.x) * w,
+        (rightTemple.y - leftTemple.y) * h
+      );
       const eyeWidth = Math.hypot(
         (rightEyeOuter.x - leftEyeOuter.x) * w,
         (rightEyeOuter.y - leftEyeOuter.y) * h
       );
-      const glassesWidth = eyeWidth * 1.55;
-      const lensWidth = glassesWidth * 0.38;
-      const lensHeight = lensWidth * 0.72;
-      const bridgeWidth = glassesWidth * 0.12;
 
-      // Center point
-      const cx = noseBridge.x * w;
+      // Center point between eyes
+      const cx = ((leftEyeOuter.x + rightEyeOuter.x) / 2) * w;
       const cy = noseBridge.y * h;
 
-      // Rotation angle
+      // Rotation angle based on eye line
       const angle = Math.atan2(
         (rightEyeOuter.y - leftEyeOuter.y) * h,
         (rightEyeOuter.x - leftEyeOuter.x) * w
@@ -746,9 +746,11 @@
       // Draw glasses image overlay
       if (glassesImgLoaded) {
         const imgAspect = glassesImg.naturalWidth / glassesImg.naturalHeight;
-        const drawW = glassesWidth * 1.35;
+        // Scale to match face width (temple to temple)
+        const drawW = templeWidth * 1.1;
         const drawH = drawW / imgAspect;
-        ctx.drawImage(glassesImg, -drawW / 2, -drawH / 2 + drawH * 0.05, drawW, drawH);
+        // Center vertically on eye line, slight offset down for nose bridge
+        ctx.drawImage(glassesImg, -drawW / 2, -drawH * 0.4, drawW, drawH);
       }
 
       ctx.restore();
