@@ -609,37 +609,11 @@
     let tryonActive = false;
     let currentFacing = 'user';
 
-    // Glasses overlay — front-view SVG (no temples, symmetric)
+    // Glasses image overlay — real product photo
     const glassesImg = new Image();
     let glassesImgLoaded = false;
     glassesImg.onload = () => { glassesImgLoaded = true; };
-    const _svgOverlay = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 170">
-      <defs>
-        <linearGradient id="browL" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a2a2a"/><stop offset="100%" stop-color="#111"/></linearGradient>
-        <linearGradient id="metalRim" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c8c8c8"/><stop offset="100%" stop-color="#999"/></linearGradient>
-      </defs>
-      <!-- Left lens -->
-      <rect x="15" y="12" width="172" height="132" rx="16" fill="rgba(220,235,255,0.06)" stroke="url(#metalRim)" stroke-width="2.5"/>
-      <path d="M13,60 L13,32 Q13,10 44,10 L162,10 Q189,10 189,32 L189,60" fill="url(#browL)"/>
-      <path d="M13,60 L189,60" stroke="#333" stroke-width="1"/>
-      <ellipse cx="90" cy="70" rx="45" ry="22" fill="rgba(255,255,255,0.035)" transform="rotate(-12 90 70)"/>
-      <!-- Right lens -->
-      <rect x="233" y="12" width="172" height="132" rx="16" fill="rgba(220,235,255,0.06)" stroke="url(#metalRim)" stroke-width="2.5"/>
-      <path d="M231,60 L231,32 Q231,10 262,10 L380,10 Q407,10 407,32 L407,60" fill="url(#browL)"/>
-      <path d="M231,60 L407,60" stroke="#333" stroke-width="1"/>
-      <ellipse cx="330" cy="70" rx="45" ry="22" fill="rgba(255,255,255,0.035)" transform="rotate(-12 330 70)"/>
-      <!-- Bridge -->
-      <path d="M189,36 Q210,22 231,36" fill="none" stroke="#bbb" stroke-width="3.5" stroke-linecap="round"/>
-      <!-- Nose pads -->
-      <path d="M192,50 Q188,68 183,88" fill="none" stroke="#bbb" stroke-width="2" stroke-linecap="round"/>
-      <path d="M228,50 Q232,68 237,88" fill="none" stroke="#bbb" stroke-width="2" stroke-linecap="round"/>
-      <ellipse cx="181" cy="90" rx="5" ry="8" fill="none" stroke="#bbb" stroke-width="1.5"/>
-      <ellipse cx="239" cy="90" rx="5" ry="8" fill="none" stroke="#bbb" stroke-width="1.5"/>
-      <!-- Rivets -->
-      <circle cx="30" cy="40" r="3.5" fill="#d0d0d0" stroke="#aaa" stroke-width="0.5"/>
-      <circle cx="390" cy="40" r="3.5" fill="#d0d0d0" stroke="#aaa" stroke-width="0.5"/>
-    </svg>`;
-    glassesImg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(_svgOverlay);
+    glassesImg.src = 'glasses-tryon.png';
 
     // Smooth tracking state
     let smoothCx = 0, smoothCy = 0, smoothAngle = 0, smoothW = 0;
