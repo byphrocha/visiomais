@@ -107,7 +107,7 @@
     .tryon-title svg{width:20px;height:20px}
     .tryon-close{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:white;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center;transition:all .3s;backdrop-filter:blur(4px)}
     .tryon-close:hover{background:rgba(255,255,255,.3);transform:scale(1.1)}
-    .tryon-container{position:relative;width:100%;max-width:640px;aspect-ratio:4/3;overflow:hidden;border-radius:16px}
+    .tryon-container{position:relative;width:100%;max-width:900px;aspect-ratio:16/9;overflow:hidden;border-radius:16px;box-shadow:0 0 60px rgba(0,0,0,.5)}
     .tryon-container video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
     .tryon-container canvas{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);pointer-events:none}
     .tryon-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;gap:16px;z-index:5}
@@ -603,7 +603,7 @@
       evt.currentTarget.classList.add('active');
     }
 
-    /* ========== VIRTUAL TRY-ON ========== */
+    /* ========== VIRTUAL TRY-ON — Enhanced Face Tracking ========== */
     let tryonCamera = null;
     let faceMesh = null;
     let tryonActive = false;
@@ -611,20 +611,30 @@
 
     // Glasses image overlay — real product photo
     const glassesImg = new Image();
+    glassesImg.crossOrigin = 'anonymous';
     let glassesImgLoaded = false;
     glassesImg.onload = () => { glassesImgLoaded = true; };
     glassesImg.src = 'glasses-tryon.png';
 
-    // Smooth tracking state
-    let smoothCx = 0, smoothCy = 0, smoothAngle = 0, smoothW = 0;
-    let smoothInitialized = false;
-    const SMOOTH = 0.7;
+    // ---- Smoothing state (exponential moving average) ----
+    const S = {
+      cx: 0, cy: 0,       // center position
+      w: 0,                // glasses width
+      roll: 0,             // head roll
+      yaw: 0,              // head yaw (left-right turn)
+      pitch: 0,            // head pitch (up-down)
+      init: false
+    };
+    const LERP = 0.45;     // lower = smoother, higher = more responsive
+
+    function lerp(a, b, t) { return a + (b - a) * t; }
 
     function openTryOn() {
       const modal = document.getElementById('tryonModal');
       modal.classList.add('active');
       document.body.style.overflow = 'hidden';
       tryonActive = true;
+      S.init = false;
       initTryOn();
     }
 
@@ -648,17 +658,16 @@
       const video = document.getElementById('tryonVideo');
       const canvas = document.getElementById('tryonCanvas');
       const loading = document.getElementById('tryonLoading');
-      loading.classList.remove('hidden');
+      loading.style.display = 'flex';
 
       try {
-        // Check for multiple cameras (show flip button on mobile)
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices.filter(d => d.kind === 'videoinput');
         if (videoDevices.length > 1) {
           document.getElementById('btnFlipCamera').style.display = 'flex';
         }
 
-        // Initialize FaceMesh
+        // Initialize FaceMesh with refined landmarks for accuracy
         if (!faceMesh) {
           faceMesh = new FaceMesh({
             locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
@@ -666,34 +675,33 @@
           faceMesh.setOptions({
             maxNumFaces: 1,
             refineLandmarks: true,
-            minDetectionConfidence: 0.5,
-            minTrackingConfidence: 0.5
+            minDetectionConfidence: 0.6,
+            minTrackingConfidence: 0.6
           });
           faceMesh.onResults((results) => onFaceMeshResults(results, canvas));
         }
 
-        // Start camera
+        // Start camera with higher resolution for better tracking
         tryonCamera = new Camera(video, {
           onFrame: async () => {
             if (tryonActive && faceMesh) {
               await faceMesh.send({ image: video });
             }
           },
-          width: 640,
-          height: 480,
+          width: 1280,
+          height: 720,
           facingMode: currentFacing
         });
         await tryonCamera.start();
 
-        // Set canvas dimensions
-        canvas.width = video.videoWidth || 640;
-        canvas.height = video.videoHeight || 480;
+        canvas.width = video.videoWidth || 1280;
+        canvas.height = video.videoHeight || 720;
 
-        loading.classList.add('hidden');
+        loading.style.display = 'none';
       } catch (err) {
         loading.innerHTML = `<div class="tryon-error">
-          <p style="font-size:1.2rem;margin-bottom:12px">Camera nao disponivel</p>
-          <p style="opacity:.7">Verifique se o navegador tem permissao para acessar a camera.</p>
+          <p style="font-size:1.2rem;margin-bottom:12px">Câmera não disponível</p>
+          <p style="opacity:.7">Verifique se o navegador tem permissão para acessar a câmera.</p>
           <p style="opacity:.5;margin-top:8px;font-size:.8rem">${err.message}</p>
         </div>`;
       }
@@ -711,59 +719,125 @@
       ctx.clearRect(0, 0, vw, vh);
 
       if (!results.multiFaceLandmarks || !results.multiFaceLandmarks.length) {
-        smoothInitialized = false;
+        S.init = false;
         return;
       }
       if (!glassesImgLoaded) return;
 
       const lm = results.multiFaceLandmarks[0];
 
-      // Key landmarks
-      const leO = lm[33];   // left eye outer corner
-      const reO = lm[263];  // right eye outer corner
-      const leI = lm[133];  // left eye inner corner
-      const reI = lm[362];  // right eye inner corner
-      const lT = lm[234];   // left temple (ear)
-      const rT = lm[454];   // right temple (ear)
+      /* ================================================
+         KEY FACE LANDMARKS (MediaPipe FaceMesh 468+)
+         ================================================
+         33  = left eye outer corner
+         263 = right eye outer corner
+         133 = left eye inner corner
+         362 = right eye inner corner
+         6   = nose bridge (between the eyes)
+         168 = forehead center (above nose bridge)
+         1   = nose tip
+         234 = left temple (ear area)
+         454 = right temple (ear area)
+         10  = top of forehead
+         152 = chin bottom
+         NOTE: in selfie mode (mirrored video), left/right
+         in landmarks are anatomical (person's left/right)
+      */
 
-      // Pixel coordinates
-      const lx = leO.x * vw, ly = leO.y * vh;
-      const rx = reO.x * vw, ry = reO.y * vh;
-      const lix = leI.x * vw, liy = leI.y * vh;
-      const rix = reI.x * vw, riy = reI.y * vh;
+      // -- Eye corners in pixel coordinates --
+      const leO = { x: lm[33].x * vw, y: lm[33].y * vh };   // left eye outer
+      const reO = { x: lm[263].x * vw, y: lm[263].y * vh };  // right eye outer
+      const leI = { x: lm[133].x * vw, y: lm[133].y * vh };  // left eye inner
+      const reI = { x: lm[362].x * vw, y: lm[362].y * vh };  // right eye inner
 
-      // Center between outer eye corners
-      const rawCx = (lx + rx) / 2;
-      const rawCy = (ly + ry) / 2;
+      // -- Nose bridge (where glasses rest) --
+      const nb = { x: lm[6].x * vw, y: lm[6].y * vh, z: lm[6].z };
 
-      // Width: temple-to-temple distance, scaled up slightly
-      const rawW = Math.hypot((rT.x - lT.x) * vw, (rT.y - lT.y) * vh) * 1.25;
+      // -- Temples (for full glasses width) --
+      const lT = { x: lm[234].x * vw, y: lm[234].y * vh };
+      const rT = { x: lm[454].x * vw, y: lm[454].y * vh };
 
-      // Head tilt angle from eye corners
-      const rawAngle = Math.atan2(ry - ly, rx - lx);
+      // -- Forehead and chin for face proportions --
+      const fh = { x: lm[10].x * vw, y: lm[10].y * vh };
+      const chin = { x: lm[152].x * vw, y: lm[152].y * vh };
+      const noseTip = { x: lm[1].x * vw, y: lm[1].y * vh, z: lm[1].z };
 
-      // Smooth interpolation (instant on first frame)
-      if (!smoothInitialized) {
-        smoothCx = rawCx; smoothCy = rawCy;
-        smoothAngle = rawAngle; smoothW = rawW;
-        smoothInitialized = true;
+      // ---- CALCULATE GLASSES POSITION ----
+
+      // Center: midpoint between inner eye corners (bridge of nose area)
+      // Slight offset toward nose bridge landmark for vertical accuracy
+      const eyeMidX = (leI.x + reI.x) / 2;
+      const eyeMidY = (leI.y + reI.y) / 2;
+      const rawCx = eyeMidX * 0.5 + nb.x * 0.5;
+      const rawCy = eyeMidY * 0.6 + nb.y * 0.4;
+
+      // Width: use outer eye corner distance as reference, with proportional padding
+      const eyeOuterDist = Math.hypot(reO.x - leO.x, reO.y - leO.y);
+      // Glasses should extend ~30% beyond each outer eye corner
+      const rawW = eyeOuterDist * 1.55;
+
+      // Head roll (tilt) from eye corners
+      const rawRoll = Math.atan2(reO.y - leO.y, reO.x - leO.x);
+
+      // Head yaw (left-right rotation) estimated from nose position
+      // relative to eye midpoint — when nose is left of center, face turns left
+      const eyeCenterX = (leO.x + reO.x) / 2;
+      const noseOffsetX = (noseTip.x - eyeCenterX) / eyeOuterDist;
+      const rawYaw = noseOffsetX * 0.8; // Normalized yaw estimate
+
+      // Head pitch estimate from nose tip vs bridge vertical distance
+      const faceHeight = Math.hypot(chin.x - fh.x, chin.y - fh.y);
+      const noseToEyeV = (noseTip.y - nb.y) / faceHeight;
+      const rawPitch = (noseToEyeV - 0.22) * 2.0; // Centered around neutral
+
+      // ---- SMOOTH ALL VALUES ----
+      if (!S.init) {
+        S.cx = rawCx; S.cy = rawCy;
+        S.w = rawW; S.roll = rawRoll;
+        S.yaw = rawYaw; S.pitch = rawPitch;
+        S.init = true;
       } else {
-        smoothCx += (rawCx - smoothCx) * SMOOTH;
-        smoothCy += (rawCy - smoothCy) * SMOOTH;
-        smoothAngle += (rawAngle - smoothAngle) * SMOOTH;
-        smoothW += (rawW - smoothW) * SMOOTH;
+        S.cx = lerp(S.cx, rawCx, LERP);
+        S.cy = lerp(S.cy, rawCy, LERP);
+        S.w = lerp(S.w, rawW, LERP);
+        S.roll = lerp(S.roll, rawRoll, LERP);
+        S.yaw = lerp(S.yaw, rawYaw, LERP);
+        S.pitch = lerp(S.pitch, rawPitch, LERP);
       }
 
-      // Draw glasses maintaining aspect ratio
-      const drawW = smoothW;
+      // ---- DRAW GLASSES ----
+      const drawW = S.w;
       const imgAspect = glassesImg.naturalWidth / glassesImg.naturalHeight;
       const drawH = drawW / imgAspect;
 
-      // The SVG eye-line is at ~42% from top, so offset to align with detected eyes
+      // Vertical offset: the bridge/nose pad area is approximately
+      // at 45% from the top of the glasses image
+      const bridgeYRatio = 0.45;
+
+      // Horizontal skew for yaw (perspective effect)
+      // When face turns right, left side of glasses appears wider
+      const skewX = S.yaw * 0.15;
+
+      // Vertical squeeze for pitch
+      const scaleY = 1.0 - Math.abs(S.pitch) * 0.08;
+
       ctx.save();
-      ctx.translate(smoothCx, smoothCy);
-      ctx.rotate(smoothAngle);
-      ctx.drawImage(glassesImg, -drawW / 2, -drawH * 0.42, drawW, drawH);
+      ctx.translate(S.cx, S.cy);
+      ctx.rotate(S.roll);
+
+      // Apply perspective transform via skew
+      ctx.transform(1, skewX, 0, scaleY, 0, 0);
+
+      // Slight opacity variation based on confidence (always near 1)
+      ctx.globalAlpha = 0.97;
+
+      ctx.drawImage(
+        glassesImg,
+        -drawW / 2,
+        -drawH * bridgeYRatio,
+        drawW,
+        drawH
+      );
       ctx.restore();
     }
 
@@ -771,7 +845,6 @@
       const video = document.getElementById('tryonVideo');
       const overlayCanvas = document.getElementById('tryonCanvas');
 
-      // Create a temporary canvas to combine video + overlay
       const tempCanvas = document.createElement('canvas');
       tempCanvas.width = overlayCanvas.width;
       tempCanvas.height = overlayCanvas.height;
@@ -784,7 +857,7 @@
       tctx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
       tctx.restore();
 
-      // Draw overlay (mirrored)
+      // Draw overlay (mirrored to match)
       tctx.save();
       tctx.translate(tempCanvas.width, 0);
       tctx.scale(-1, 1);
@@ -809,6 +882,7 @@
         video.srcObject.getTracks().forEach(t => t.stop());
         video.srcObject = null;
       }
+      S.init = false;
       await initTryOn();
     }
 
