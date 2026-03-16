@@ -95,6 +95,38 @@
     .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(24,88,200,.4)}
     .btn-secondary{background:var(--cream);color:var(--navy);border:2px solid var(--gray-lt);transition:all .3s}
     .btn-secondary:hover{border-color:var(--blue);background:rgba(24,88,200,.08);transform:translateY(-1px)}
+    .btn-tryon{background:linear-gradient(135deg,var(--gold),#d4af37);color:var(--navy);box-shadow:0 8px 24px rgba(196,163,90,.3);position:relative;overflow:hidden}
+    .btn-tryon::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:rgba(255,255,255,.2);transition:left .3s}
+    .btn-tryon:hover::before{left:100%}
+    .btn-tryon:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(196,163,90,.4)}
+
+    /* VIRTUAL TRY-ON MODAL */
+    .tryon-modal{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.95);flex-direction:column;align-items:center;justify-content:center}
+    .tryon-modal.active{display:flex}
+    .tryon-header{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:16px 24px;z-index:10;background:linear-gradient(180deg,rgba(0,0,0,.7),transparent)}
+    .tryon-title{color:white;font-size:1rem;font-weight:700;display:flex;align-items:center;gap:10px}
+    .tryon-title svg{width:20px;height:20px}
+    .tryon-close{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:white;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center;transition:all .3s;backdrop-filter:blur(4px)}
+    .tryon-close:hover{background:rgba(255,255,255,.3);transform:scale(1.1)}
+    .tryon-container{position:relative;width:100%;height:100%;max-width:640px;max-height:480px;overflow:hidden;border-radius:16px}
+    .tryon-container video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+    .tryon-container canvas{position:absolute;top:0;left:0;width:100%;height:100%;transform:scaleX(-1)}
+    .tryon-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;gap:16px;z-index:5}
+    .tryon-loading.hidden{display:none}
+    .tryon-spinner{width:48px;height:48px;border:4px solid rgba(255,255,255,.2);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .tryon-loading p{font-size:.9rem;opacity:.8;text-align:center;max-width:280px}
+    .tryon-footer{position:absolute;bottom:0;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:12px;padding:20px 24px;z-index:10;background:linear-gradient(0deg,rgba(0,0,0,.7),transparent)}
+    .tryon-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:white;padding:10px 20px;border-radius:var(--r);cursor:pointer;font-size:.85rem;font-weight:600;transition:all .3s;backdrop-filter:blur(4px);display:flex;align-items:center;gap:8px}
+    .tryon-btn:hover{background:rgba(255,255,255,.25);transform:translateY(-2px)}
+    .tryon-btn.active{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+    .tryon-error{color:#ff6b6b;font-size:.9rem;text-align:center;padding:20px}
+    @media(max-width:768px){
+      .tryon-container{max-width:100%;max-height:100%;border-radius:0}
+      .tryon-header{padding:12px 16px}
+      .tryon-footer{padding:16px;gap:8px;flex-wrap:wrap;justify-content:center}
+      .tryon-btn{padding:8px 14px;font-size:.8rem}
+    }
 
     .extras{background:var(--cream);padding:20px;border-radius:var(--r);margin-bottom:24px}
     .extras h4{font-size:.9rem;color:var(--navy);margin-bottom:12px;font-weight:700}
@@ -345,6 +377,10 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
             Comprar via WhatsApp
           </button>
+          <button class="btn-action btn-tryon" onclick="openTryOn()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            Provador Virtual
+          </button>
           <button class="btn-action btn-secondary" onclick="alert('Adicionado aos favoritos!')">
             ♡ Adicionar aos Favoritos
           </button>
@@ -490,6 +526,35 @@
     </div>
   </div>
 
+  <!-- VIRTUAL TRY-ON MODAL -->
+  <div class="tryon-modal" id="tryonModal">
+    <div class="tryon-header">
+      <div class="tryon-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        Provador Virtual
+      </div>
+      <button class="tryon-close" onclick="closeTryOn()">&times;</button>
+    </div>
+    <div class="tryon-container" id="tryonContainer">
+      <video id="tryonVideo" autoplay playsinline></video>
+      <canvas id="tryonCanvas"></canvas>
+      <div class="tryon-loading" id="tryonLoading">
+        <div class="tryon-spinner"></div>
+        <p>Carregando provador virtual... Permita o acesso a camera.</p>
+      </div>
+    </div>
+    <div class="tryon-footer">
+      <button class="tryon-btn" onclick="capturePhoto()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+        Capturar Foto
+      </button>
+      <button class="tryon-btn" id="btnFlipCamera" onclick="flipCamera()" style="display:none">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        Virar Camera
+      </button>
+    </div>
+  </div>
+
   <!-- FOOTER -->
   <footer id="footer">
     <div class="footer-inner">
@@ -528,15 +593,309 @@
     </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
   <script>
     function openTab(evt, tabName) {
       const contents = document.querySelectorAll('.tab-content');
       contents.forEach(c => c.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-
       document.getElementById(tabName).classList.add('active');
       evt.currentTarget.classList.add('active');
     }
+
+    /* ========== VIRTUAL TRY-ON ========== */
+    let tryonCamera = null;
+    let faceMesh = null;
+    let tryonActive = false;
+    let currentFacing = 'user';
+
+    // Glasses drawing config - adjust per product
+    const glassesConfig = {
+      frameColor: '#1858C8',
+      frameWidth: 5,
+      lensColor: 'rgba(24,88,200,0.08)',
+      bridgeColor: '#1858C8',
+      templeColor: '#1858C8',
+      style: 'clubmaster' // clubmaster, round, square, rectangular
+    };
+
+    function openTryOn() {
+      const modal = document.getElementById('tryonModal');
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      tryonActive = true;
+      initTryOn();
+    }
+
+    function closeTryOn() {
+      const modal = document.getElementById('tryonModal');
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+      tryonActive = false;
+      if (tryonCamera) {
+        tryonCamera.stop();
+        tryonCamera = null;
+      }
+      const video = document.getElementById('tryonVideo');
+      if (video.srcObject) {
+        video.srcObject.getTracks().forEach(t => t.stop());
+        video.srcObject = null;
+      }
+    }
+
+    async function initTryOn() {
+      const video = document.getElementById('tryonVideo');
+      const canvas = document.getElementById('tryonCanvas');
+      const loading = document.getElementById('tryonLoading');
+      loading.classList.remove('hidden');
+
+      try {
+        // Check for multiple cameras (show flip button on mobile)
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(d => d.kind === 'videoinput');
+        if (videoDevices.length > 1) {
+          document.getElementById('btnFlipCamera').style.display = 'flex';
+        }
+
+        // Initialize FaceMesh
+        if (!faceMesh) {
+          faceMesh = new FaceMesh({
+            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+          });
+          faceMesh.setOptions({
+            maxNumFaces: 1,
+            refineLandmarks: true,
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
+          });
+          faceMesh.onResults((results) => onFaceMeshResults(results, canvas));
+        }
+
+        // Start camera
+        tryonCamera = new Camera(video, {
+          onFrame: async () => {
+            if (tryonActive && faceMesh) {
+              await faceMesh.send({ image: video });
+            }
+          },
+          width: 640,
+          height: 480,
+          facingMode: currentFacing
+        });
+        await tryonCamera.start();
+
+        // Set canvas dimensions
+        canvas.width = video.videoWidth || 640;
+        canvas.height = video.videoHeight || 480;
+
+        loading.classList.add('hidden');
+      } catch (err) {
+        loading.innerHTML = `<div class="tryon-error">
+          <p style="font-size:1.2rem;margin-bottom:12px">Camera nao disponivel</p>
+          <p style="opacity:.7">Verifique se o navegador tem permissao para acessar a camera.</p>
+          <p style="opacity:.5;margin-top:8px;font-size:.8rem">${err.message}</p>
+        </div>`;
+      }
+    }
+
+    function onFaceMeshResults(results, canvas) {
+      const ctx = canvas.getContext('2d');
+      canvas.width = results.image.width;
+      canvas.height = results.image.height;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) return;
+
+      const landmarks = results.multiFaceLandmarks[0];
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // Key face landmarks for glasses positioning
+      // 33: left eye inner, 133: left eye outer, 362: right eye inner, 263: right eye outer
+      // 168: nose bridge top, 6: nose bridge mid
+      const leftEyeOuter = landmarks[33];
+      const leftEyeInner = landmarks[133];
+      const rightEyeInner = landmarks[362];
+      const rightEyeOuter = landmarks[263];
+      const noseBridge = landmarks[168];
+      const leftTemple = landmarks[234];
+      const rightTemple = landmarks[454];
+      const leftEyeTop = landmarks[159];
+      const leftEyeBottom = landmarks[145];
+
+      // Calculate glasses dimensions
+      const eyeWidth = Math.hypot(
+        (rightEyeOuter.x - leftEyeOuter.x) * w,
+        (rightEyeOuter.y - leftEyeOuter.y) * h
+      );
+      const glassesWidth = eyeWidth * 1.55;
+      const lensWidth = glassesWidth * 0.38;
+      const lensHeight = lensWidth * 0.72;
+      const bridgeWidth = glassesWidth * 0.12;
+
+      // Center point
+      const cx = noseBridge.x * w;
+      const cy = noseBridge.y * h;
+
+      // Rotation angle
+      const angle = Math.atan2(
+        (rightEyeOuter.y - leftEyeOuter.y) * h,
+        (rightEyeOuter.x - leftEyeOuter.x) * w
+      );
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(angle);
+
+      const fc = glassesConfig.frameColor;
+      const fw = glassesConfig.frameWidth;
+      const lc = glassesConfig.lensColor;
+
+      // Choose drawing style
+      drawGlasses(ctx, glassesWidth, lensWidth, lensHeight, bridgeWidth, fc, fw, lc);
+
+      ctx.restore();
+    }
+
+    function drawGlasses(ctx, gw, lw, lh, bw, fc, fw, lc) {
+      const halfGW = gw / 2;
+      const style = glassesConfig.style;
+
+      // Left lens
+      const leftLensX = -halfGW + lw * 0.1;
+      const rightLensX = halfGW - lw * 1.1;
+      const lensY = -lh / 2;
+
+      ctx.lineWidth = fw;
+      ctx.strokeStyle = fc;
+      ctx.fillStyle = lc;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      let rx;
+      if (style === 'clubmaster') rx = lh * 0.35;
+      else if (style === 'round') rx = lh * 0.5;
+      else if (style === 'square') rx = lh * 0.12;
+      else rx = lh * 0.2;
+
+      // Draw left lens
+      drawRoundedRect(ctx, leftLensX, lensY, lw, lh, rx);
+      ctx.fill();
+      ctx.stroke();
+
+      // Draw right lens
+      drawRoundedRect(ctx, rightLensX, lensY, lw, lh, rx);
+      ctx.fill();
+      ctx.stroke();
+
+      // Bridge
+      ctx.beginPath();
+      ctx.moveTo(leftLensX + lw, 0);
+      ctx.quadraticCurveTo(0, -lh * 0.15, rightLensX, 0);
+      ctx.stroke();
+
+      // Temples (arms) - subtle lines going to ears
+      const templeLen = gw * 0.25;
+      ctx.lineWidth = fw * 0.7;
+
+      // Left temple
+      ctx.beginPath();
+      ctx.moveTo(leftLensX, 0);
+      ctx.lineTo(leftLensX - templeLen, lh * 0.15);
+      ctx.stroke();
+
+      // Right temple
+      ctx.beginPath();
+      ctx.moveTo(rightLensX + lw, 0);
+      ctx.lineTo(rightLensX + lw + templeLen, lh * 0.15);
+      ctx.stroke();
+
+      // Clubmaster style: thicker top frame
+      if (style === 'clubmaster') {
+        ctx.lineWidth = fw * 1.8;
+        ctx.beginPath();
+        ctx.moveTo(leftLensX, lensY + rx);
+        ctx.lineTo(leftLensX, lensY + rx * 0.3);
+        ctx.quadraticCurveTo(leftLensX, lensY, leftLensX + rx, lensY);
+        ctx.lineTo(leftLensX + lw - rx, lensY);
+        ctx.quadraticCurveTo(leftLensX + lw, lensY, leftLensX + lw, lensY + rx * 0.3);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(rightLensX, lensY + rx);
+        ctx.lineTo(rightLensX, lensY + rx * 0.3);
+        ctx.quadraticCurveTo(rightLensX, lensY, rightLensX + rx, lensY);
+        ctx.lineTo(rightLensX + lw - rx, lensY);
+        ctx.quadraticCurveTo(rightLensX + lw, lensY, rightLensX + lw, lensY + rx * 0.3);
+        ctx.stroke();
+      }
+    }
+
+    function drawRoundedRect(ctx, x, y, w, h, r) {
+      r = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    function capturePhoto() {
+      const video = document.getElementById('tryonVideo');
+      const overlayCanvas = document.getElementById('tryonCanvas');
+
+      // Create a temporary canvas to combine video + overlay
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = overlayCanvas.width;
+      tempCanvas.height = overlayCanvas.height;
+      const tctx = tempCanvas.getContext('2d');
+
+      // Draw mirrored video
+      tctx.save();
+      tctx.translate(tempCanvas.width, 0);
+      tctx.scale(-1, 1);
+      tctx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
+      tctx.restore();
+
+      // Draw overlay (mirrored)
+      tctx.save();
+      tctx.translate(tempCanvas.width, 0);
+      tctx.scale(-1, 1);
+      tctx.drawImage(overlayCanvas, 0, 0);
+      tctx.restore();
+
+      // Download
+      const link = document.createElement('a');
+      link.download = 'visiomais-provador-virtual.png';
+      link.href = tempCanvas.toDataURL('image/png');
+      link.click();
+    }
+
+    async function flipCamera() {
+      currentFacing = currentFacing === 'user' ? 'environment' : 'user';
+      if (tryonCamera) {
+        tryonCamera.stop();
+        tryonCamera = null;
+      }
+      const video = document.getElementById('tryonVideo');
+      if (video.srcObject) {
+        video.srcObject.getTracks().forEach(t => t.stop());
+        video.srcObject = null;
+      }
+      await initTryOn();
+    }
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && tryonActive) closeTryOn();
+    });
   </script>
 </body>
 </html>
