@@ -109,7 +109,7 @@
     .tryon-close:hover{background:rgba(255,255,255,.3);transform:scale(1.1)}
     .tryon-container{position:relative;width:100%;max-width:640px;aspect-ratio:4/3;overflow:hidden;border-radius:16px}
     .tryon-container video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
-    .tryon-container canvas{position:absolute;top:0;left:0;width:100%;height:100%;transform:scaleX(-1);pointer-events:none}
+    .tryon-container canvas{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);pointer-events:none}
     .tryon-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;gap:16px;z-index:5}
     .tryon-loading.hidden{display:none}
     .tryon-spinner{width:48px;height:48px;border:4px solid rgba(255,255,255,.2);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
@@ -617,7 +617,8 @@
 
     // Smooth tracking state
     let smoothCx = 0, smoothCy = 0, smoothAngle = 0, smoothW = 0;
-    const SMOOTH = 0.35; // lower = smoother (0-1)
+    let smoothInitialized = false;
+    const SMOOTH = 0.4;
 
     function openTryOn() {
       const modal = document.getElementById('tryonModal');
@@ -703,7 +704,6 @@
       const vw = results.image.width;
       const vh = results.image.height;
 
-      // Match canvas internal resolution to video
       if (canvas.width !== vw || canvas.height !== vh) {
         canvas.width = vw;
         canvas.height = vh;
@@ -715,56 +715,63 @@
 
       const lm = results.multiFaceLandmarks[0];
 
-      // Key face points (normalized 0-1)
-      const leO = lm[33];   // left eye outer corner
-      const reO = lm[263];  // right eye outer corner
-      const nose = lm[168]; // nose bridge
+      // Key landmarks (normalized 0-1)
+      const leO = lm[33];   // left eye outer
+      const reO = lm[263];  // right eye outer
+      const nose = lm[168]; // nose bridge top
       const lT = lm[234];   // left temple
       const rT = lm[454];   // right temple
-      const leTop = lm[159]; // left eye top
-      const reTop = lm[386]; // right eye top
 
-      // Eye center in pixels
-      const rawCx = ((leO.x + reO.x) / 2) * vw;
-      const rawCy = ((leO.y + reO.y) / 2 * 0.5 + nose.y * 0.5) * vh;
+      // Convert to pixel coords
+      const leftEyeX = leO.x * vw;
+      const leftEyeY = leO.y * vh;
+      const rightEyeX = reO.x * vw;
+      const rightEyeY = reO.y * vh;
+      const noseX = nose.x * vw;
+      const noseY = nose.y * vh;
 
-      // Eye-to-eye distance for sizing
-      const rawEyeW = Math.hypot((reO.x - leO.x) * vw, (reO.y - leO.y) * vh);
+      // Center between eyes, slightly above toward nose bridge
+      const rawCx = (leftEyeX + rightEyeX) / 2;
+      const rawCy = (leftEyeY + rightEyeY) / 2 * 0.65 + noseY * 0.35;
 
-      // Head rotation angle
-      const rawAngle = Math.atan2(
-        (reO.y - leO.y) * vh,
-        (reO.x - leO.x) * vw
-      );
+      // Temple-to-temple for width (wider than eye-to-eye)
+      const templeW = Math.hypot((rT.x - lT.x) * vw, (rT.y - lT.y) * vh);
 
-      // Apply smoothing for natural movement
-      smoothCx += (rawCx - smoothCx) * SMOOTH;
-      smoothCy += (rawCy - smoothCy) * SMOOTH;
-      smoothAngle += (rawAngle - smoothAngle) * SMOOTH;
-      smoothW += (rawEyeW - smoothW) * SMOOTH;
+      // Eye-to-eye distance
+      const eyeW = Math.hypot(rightEyeX - leftEyeX, rightEyeY - leftEyeY);
 
-      // Glasses dimensions
-      const drawW = smoothW * 1.75;
+      // Use temple width for sizing (gives better coverage)
+      const rawW = templeW * 1.15;
+
+      // Head tilt angle
+      const rawAngle = Math.atan2(rightEyeY - leftEyeY, rightEyeX - leftEyeX);
+
+      // Initialize smooth values on first detection (avoid lerp from 0,0)
+      if (!smoothInitialized) {
+        smoothCx = rawCx;
+        smoothCy = rawCy;
+        smoothAngle = rawAngle;
+        smoothW = rawW;
+        smoothInitialized = true;
+      } else {
+        smoothCx += (rawCx - smoothCx) * SMOOTH;
+        smoothCy += (rawCy - smoothCy) * SMOOTH;
+        smoothAngle += (rawAngle - smoothAngle) * SMOOTH;
+        smoothW += (rawW - smoothW) * SMOOTH;
+      }
+
+      // Glasses dimensions maintaining aspect ratio
+      const drawW = smoothW;
       const imgAspect = glassesImg.naturalWidth / glassesImg.naturalHeight;
       const drawH = drawW / imgAspect;
-
-      // Crop temple arms from source image (keep 10%-90% of width)
-      const srcW = glassesImg.naturalWidth;
-      const srcH = glassesImg.naturalHeight;
-      const cropMargin = srcW * 0.08;
-      const cropW = srcW - cropMargin * 2;
 
       ctx.save();
       ctx.translate(smoothCx, smoothCy);
       ctx.rotate(smoothAngle);
-
-      // Draw glasses centered on eyes
       ctx.drawImage(
         glassesImg,
-        cropMargin, 0, cropW, srcH,
         -drawW / 2, -drawH * 0.45, drawW, drawH
       );
-
       ctx.restore();
     }
 
