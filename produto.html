@@ -107,9 +107,8 @@
     .tryon-title svg{width:20px;height:20px}
     .tryon-close{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:white;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center;transition:all .3s;backdrop-filter:blur(4px)}
     .tryon-close:hover{background:rgba(255,255,255,.3);transform:scale(1.1)}
-    .tryon-container{position:relative;width:100%;max-width:900px;overflow:hidden;border-radius:16px;box-shadow:0 0 60px rgba(0,0,0,.5)}
-    .tryon-container video{position:absolute;top:0;left:0;width:0;height:0;opacity:0;pointer-events:none}
-    .tryon-container canvas{display:block;width:100%;height:auto}
+    .tryon-container{position:relative;width:100%;max-width:900px;height:75vh;overflow:hidden;border-radius:16px;box-shadow:0 0 60px rgba(0,0,0,.5)}
+    .tryon-container .a-canvas{width:100%!important;height:100%!important;position:absolute!important;top:0;left:0;object-fit:cover}
     .tryon-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;gap:16px;z-index:5}
     .tryon-loading.hidden{display:none}
     .tryon-spinner{width:48px;height:48px;border:4px solid rgba(255,255,255,.2);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
@@ -121,7 +120,7 @@
     .tryon-btn.active{background:var(--gold);color:var(--navy);border-color:var(--gold)}
     .tryon-error{color:#ff6b6b;font-size:.9rem;text-align:center;padding:20px}
     @media(max-width:768px){
-      .tryon-container{max-width:100%;max-height:100%;border-radius:0}
+      .tryon-container{max-width:100%;height:85vh;border-radius:0}
       .tryon-header{padding:12px 16px}
       .tryon-footer{padding:16px;gap:8px;flex-wrap:wrap;justify-content:center}
       .tryon-btn{padding:8px 14px;font-size:.8rem}
@@ -535,21 +534,15 @@
       <button class="tryon-close" onclick="closeTryOn()">&times;</button>
     </div>
     <div class="tryon-container" id="tryonContainer">
-      <video id="tryonVideo" autoplay playsinline></video>
-      <canvas id="tryonCanvas"></canvas>
       <div class="tryon-loading" id="tryonLoading">
         <div class="tryon-spinner"></div>
-        <p>Carregando provador virtual... Permita o acesso a camera.</p>
+        <p>Carregando provador virtual... Permita o acesso à câmera.</p>
       </div>
     </div>
     <div class="tryon-footer">
       <button class="tryon-btn" onclick="capturePhoto()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
         Capturar Foto
-      </button>
-      <button class="tryon-btn" id="btnFlipCamera" onclick="flipCamera()" style="display:none">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-        Virar Camera
       </button>
     </div>
   </div>
@@ -592,8 +585,8 @@
     </div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-face-aframe.prod.js"></script>
   <script>
     function openTab(evt, tabName) {
       const contents = document.querySelectorAll('.tab-content');
@@ -603,373 +596,177 @@
       evt.currentTarget.classList.add('active');
     }
 
-    /* ========== VIRTUAL TRY-ON — Landmark-Based Drawing ========== */
+    /* ========== VIRTUAL TRY-ON — MindAR.js 3D Face Tracking ========== */
     /*
-     * Instead of overlaying a single PNG image, we DRAW the glasses
-     * directly onto the canvas using face landmarks as anchor points.
-     * Each lens is positioned independently around each eye, and the
-     * bridge connects them. This means the glasses naturally deform
-     * and follow the face in 3D — no misalignment possible.
+     * Uses MindAR.js + A-Frame for real 3D face tracking with WebAR.
+     * 3D glasses model is anchored to face landmark 168 (nose bridge)
+     * and automatically follows head rotation, tilt, and movement
+     * in full 3D perspective — just like Meta's virtual try-on.
      */
-    let tryonCamera = null;
-    let faceMesh = null;
     let tryonActive = false;
-    let currentFacing = 'user';
-
-    // Smoothing state — per-point smoothing for accuracy
-    const SM = {
-      leO:{x:0,y:0}, reO:{x:0,y:0},
-      leI:{x:0,y:0}, reI:{x:0,y:0},
-      leUp:{x:0,y:0}, reUp:{x:0,y:0},
-      leDn:{x:0,y:0}, reDn:{x:0,y:0},
-      lT:{x:0,y:0}, rT:{x:0,y:0},
-      nb:{x:0,y:0},
-      init: false
-    };
-    const LERP = 0.5;
-    function lerp(a, b, t) { return a + (b - a) * t; }
-    function lerpPt(s, r) { s.x = lerp(s.x, r.x, LERP); s.y = lerp(s.y, r.y, LERP); }
-    function setPt(s, r) { s.x = r.x; s.y = r.y; }
 
     function openTryOn() {
-      document.getElementById('tryonModal').classList.add('active');
+      const modal = document.getElementById('tryonModal');
+      modal.classList.add('active');
       document.body.style.overflow = 'hidden';
       tryonActive = true;
-      SM.init = false;
-      initTryOn();
+
+      const container = document.getElementById('tryonContainer');
+      const loading = document.getElementById('tryonLoading');
+      loading.style.display = 'flex';
+      loading.innerHTML = '<div class="tryon-spinner"></div><p>Carregando provador virtual... Permita o acesso à câmera.</p>';
+
+      // Remove old scene if exists
+      const oldScene = document.getElementById('tryonScene');
+      if (oldScene) {
+        try {
+          const sys = oldScene.systems && oldScene.systems['mindar-face-system'];
+          if (sys) sys.stop();
+        } catch(e) {}
+        oldScene.parentNode.removeChild(oldScene);
+      }
+
+      // Create A-Frame scene dynamically
+      const sceneEl = document.createElement('a-scene');
+      sceneEl.id = 'tryonScene';
+      sceneEl.setAttribute('mindar-face', 'autoStart: true; filterMinCF: 0.001; filterBeta: 1000');
+      sceneEl.setAttribute('embedded', '');
+      sceneEl.setAttribute('color-space', 'sRGB');
+      sceneEl.setAttribute('renderer', 'colorManagement: true; physicallyCorrectLights: true; preserveDrawingBuffer: true; alpha: true');
+      sceneEl.setAttribute('vr-mode-ui', 'enabled: false');
+      sceneEl.setAttribute('device-orientation-permission-ui', 'enabled: false');
+      sceneEl.setAttribute('loading-screen', 'enabled: false');
+      sceneEl.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;';
+
+      // Build the scene HTML with 3D Clubmaster glasses
+      sceneEl.innerHTML = `
+        <a-camera active="false" position="0 0 0" look-controls="enabled: false"></a-camera>
+
+        <a-entity mindar-face-target="anchorIndex: 168">
+          <a-entity id="glassesModel" position="0 0.02 0.06">
+
+            <!-- LEFT LENS GROUP -->
+            <a-entity position="-0.032 0 0">
+              <!-- Browline bar (thick, dark tortoise) -->
+              <a-box position="0 0.013 0" width="0.058" height="0.009" depth="0.008"
+                material="shader:flat; color:#1a0e08"></a-box>
+              <!-- Browline accent (lighter brown on top) -->
+              <a-box position="0 0.018 -0.001" width="0.056" height="0.003" depth="0.006"
+                material="shader:flat; color:#3d2517"></a-box>
+              <!-- Lens (subtle blue tint, transparent) -->
+              <a-plane position="0 0 0.003" width="0.052" height="0.038"
+                material="shader:flat; color:#c8e0ff; opacity:0.1; side:double"></a-plane>
+              <!-- Bottom rim (thin, silver metal) -->
+              <a-box position="0 -0.018 0" width="0.058" height="0.002" depth="0.004"
+                material="shader:flat; color:#b8b8b8"></a-box>
+              <!-- Left side rim -->
+              <a-box position="-0.028 -0.003 0" width="0.002" height="0.030" depth="0.004"
+                material="shader:flat; color:#b8b8b8"></a-box>
+              <!-- Right side rim (inner, near bridge) -->
+              <a-box position="0.028 -0.003 0" width="0.002" height="0.030" depth="0.004"
+                material="shader:flat; color:#b8b8b8"></a-box>
+            </a-entity>
+
+            <!-- RIGHT LENS GROUP (mirror of left) -->
+            <a-entity position="0.032 0 0">
+              <a-box position="0 0.013 0" width="0.058" height="0.009" depth="0.008"
+                material="shader:flat; color:#1a0e08"></a-box>
+              <a-box position="0 0.018 -0.001" width="0.056" height="0.003" depth="0.006"
+                material="shader:flat; color:#3d2517"></a-box>
+              <a-plane position="0 0 0.003" width="0.052" height="0.038"
+                material="shader:flat; color:#c8e0ff; opacity:0.1; side:double"></a-plane>
+              <a-box position="0 -0.018 0" width="0.058" height="0.002" depth="0.004"
+                material="shader:flat; color:#b8b8b8"></a-box>
+              <a-box position="-0.028 -0.003 0" width="0.002" height="0.030" depth="0.004"
+                material="shader:flat; color:#b8b8b8"></a-box>
+              <a-box position="0.028 -0.003 0" width="0.002" height="0.030" depth="0.004"
+                material="shader:flat; color:#b8b8b8"></a-box>
+            </a-entity>
+
+            <!-- NOSE BRIDGE (metal connector) -->
+            <a-box position="0 -0.003 0.004" width="0.010" height="0.003" depth="0.004"
+              material="shader:flat; color:#b8b8b8"></a-box>
+
+            <!-- NOSE PADS -->
+            <a-sphere position="-0.008 -0.014 0.009" radius="0.003"
+              material="shader:flat; color:#d8d8d8"></a-sphere>
+            <a-sphere position="0.008 -0.014 0.009" radius="0.003"
+              material="shader:flat; color:#d8d8d8"></a-sphere>
+
+            <!-- LEFT TEMPLE ARM (extends backward toward ear) -->
+            <a-box position="-0.060 0.010 -0.050" width="0.004" height="0.005" depth="0.110"
+              material="shader:flat; color:#1a0e08"></a-box>
+            <!-- Left temple tip (ear hook, angled down) -->
+            <a-box position="-0.060 -0.008 -0.105" width="0.004" height="0.030" depth="0.005"
+              material="shader:flat; color:#1a0e08"></a-box>
+
+            <!-- RIGHT TEMPLE ARM -->
+            <a-box position="0.060 0.010 -0.050" width="0.004" height="0.005" depth="0.110"
+              material="shader:flat; color:#1a0e08"></a-box>
+            <!-- Right temple tip -->
+            <a-box position="0.060 -0.008 -0.105" width="0.004" height="0.030" depth="0.005"
+              material="shader:flat; color:#1a0e08"></a-box>
+
+            <!-- HINGE DETAILS (small metal joints where temples meet frame) -->
+            <a-box position="-0.058 0.010 0.003" width="0.008" height="0.006" depth="0.008"
+              material="shader:flat; color:#a0a0a0"></a-box>
+            <a-box position="0.058 0.010 0.003" width="0.008" height="0.006" depth="0.008"
+              material="shader:flat; color:#a0a0a0"></a-box>
+
+          </a-entity>
+        </a-entity>
+      `;
+
+      container.insertBefore(sceneEl, loading);
+
+      // Listen for AR events
+      sceneEl.addEventListener('arReady', () => {
+        loading.style.display = 'none';
+      });
+
+      sceneEl.addEventListener('arError', () => {
+        loading.innerHTML = `<div class="tryon-error">
+          <p style="font-size:1.2rem;margin-bottom:12px">Câmera não disponível</p>
+          <p style="opacity:.7">Verifique se o navegador tem permissão para acessar a câmera.</p>
+        </div>`;
+      });
     }
 
     function closeTryOn() {
       document.getElementById('tryonModal').classList.remove('active');
       document.body.style.overflow = '';
       tryonActive = false;
-      if (tryonCamera) { tryonCamera.stop(); tryonCamera = null; }
-      const video = document.getElementById('tryonVideo');
-      if (video.srcObject) {
-        video.srcObject.getTracks().forEach(t => t.stop());
-        video.srcObject = null;
-      }
-    }
 
-    async function initTryOn() {
-      const video = document.getElementById('tryonVideo');
-      const canvas = document.getElementById('tryonCanvas');
-      const loading = document.getElementById('tryonLoading');
-      loading.style.display = 'flex';
-
-      try {
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const videoDevices = devices.filter(d => d.kind === 'videoinput');
-        if (videoDevices.length > 1) {
-          document.getElementById('btnFlipCamera').style.display = 'flex';
-        }
-
-        if (!faceMesh) {
-          faceMesh = new FaceMesh({
-            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
-          });
-          faceMesh.setOptions({
-            maxNumFaces: 1,
-            refineLandmarks: true,
-            minDetectionConfidence: 0.5,
-            minTrackingConfidence: 0.5
-          });
-          faceMesh.onResults(onFaceMeshResults);
-        }
-
-        tryonCamera = new Camera(video, {
-          onFrame: async () => {
-            if (tryonActive && faceMesh) {
-              await faceMesh.send({ image: video });
-            }
-          },
-          width: 1280,
-          height: 720,
-          facingMode: currentFacing
+      const sceneEl = document.getElementById('tryonScene');
+      if (sceneEl) {
+        try {
+          const sys = sceneEl.systems['mindar-face-system'];
+          if (sys) {
+            sys.stop();
+          }
+        } catch(e) {}
+        // Stop any video streams
+        const videos = sceneEl.querySelectorAll('video');
+        videos.forEach(v => {
+          if (v.srcObject) {
+            v.srcObject.getTracks().forEach(t => t.stop());
+          }
         });
-        await tryonCamera.start();
-
-        loading.style.display = 'none';
-      } catch (err) {
-        loading.innerHTML = `<div class="tryon-error">
-          <p style="font-size:1.2rem;margin-bottom:12px">Câmera não disponível</p>
-          <p style="opacity:.7">Verifique se o navegador tem permissão para acessar a câmera.</p>
-          <p style="opacity:.5;margin-top:8px;font-size:.8rem">${err.message}</p>
-        </div>`;
+        sceneEl.parentNode.removeChild(sceneEl);
       }
-    }
-
-    function onFaceMeshResults(results) {
-      const canvas = document.getElementById('tryonCanvas');
-      const ctx = canvas.getContext('2d');
-      const vw = results.image.width;
-      const vh = results.image.height;
-
-      if (canvas.width !== vw || canvas.height !== vh) {
-        canvas.width = vw;
-        canvas.height = vh;
-      }
-
-      // Draw mirrored video
-      ctx.save();
-      ctx.translate(vw, 0);
-      ctx.scale(-1, 1);
-      ctx.drawImage(results.image, 0, 0, vw, vh);
-      ctx.restore();
-
-      if (!results.multiFaceLandmarks || !results.multiFaceLandmarks.length) {
-        SM.init = false;
-        return;
-      }
-
-      const lm = results.multiFaceLandmarks[0];
-
-      // Helper: mirrored pixel coordinates
-      function px(idx) {
-        return { x: vw - lm[idx].x * vw, y: lm[idx].y * vh };
-      }
-
-      /*
-       * Key landmarks for glasses:
-       * 33  = left eye outer corner     263 = right eye outer corner
-       * 133 = left eye inner corner     362 = right eye inner corner
-       * 159 = left eye top              386 = right eye top
-       * 145 = left eye bottom           374 = right eye bottom
-       * 234 = left temple (ear)         454 = right temple (ear)
-       * 6   = nose bridge (between eyes)
-       * 127 = left cheekbone outer      356 = right cheekbone outer
-       *
-       * After mirroring: person's left → screen right, person's right → screen left
-       */
-
-      const raw = {
-        leO: px(33),   reO: px(263),
-        leI: px(133),  reI: px(362),
-        leUp: px(159), reUp: px(386),
-        leDn: px(145), reDn: px(374),
-        lT: px(234),   rT: px(454),
-        nb: px(6)
-      };
-
-      // Smooth all points
-      if (!SM.init) {
-        for (const k in raw) setPt(SM[k], raw[k]);
-        SM.init = true;
-      } else {
-        for (const k in raw) lerpPt(SM[k], raw[k]);
-      }
-
-      // ---- DRAW CLUBMASTER GLASSES ----
-      const p = SM;
-
-      // Eye measurements
-      const leftEyeW = Math.hypot(p.leO.x - p.leI.x, p.leO.y - p.leI.y);
-      const rightEyeW = Math.hypot(p.reO.x - p.reI.x, p.reO.y - p.reI.y);
-      const leftEyeH = Math.hypot(p.leUp.x - p.leDn.x, p.leUp.y - p.leDn.y);
-      const rightEyeH = Math.hypot(p.reUp.x - p.reDn.x, p.reUp.y - p.reDn.y);
-
-      // Lens padding (how much bigger than eye opening)
-      const padX = 0.45;
-      const padY = 0.7;
-
-      // Left lens dimensions & center
-      const llW = leftEyeW * (1 + padX * 2);
-      const llH = leftEyeH * (1 + padY * 2);
-      const llCx = (p.leO.x + p.leI.x) / 2;
-      const llCy = (p.leUp.y + p.leDn.y) / 2;
-
-      // Right lens dimensions & center
-      const rlW = rightEyeW * (1 + padX * 2);
-      const rlH = rightEyeH * (1 + padY * 2);
-      const rlCx = (p.reO.x + p.reI.x) / 2;
-      const rlCy = (p.reUp.y + p.reDn.y) / 2;
-
-      // Frame thickness scales with face size
-      const faceW = Math.hypot(p.lT.x - p.rT.x, p.lT.y - p.rT.y);
-      const thick = Math.max(2, faceW * 0.006);
-      const browThick = thick * 2.5;
-
-      // Colors — Clubmaster style
-      const frameColor = '#2c1810';       // dark brown/tortoise
-      const metalColor = '#c0c0c0';       // silver metal
-      const browColor = '#1a0e08';        // dark browline
-      const lensColor = 'rgba(200,220,240,0.15)'; // very subtle lens tint
-
-      // Roll angle for tilt
-      const roll = Math.atan2(p.reO.y - p.leO.y, p.reO.x - p.leO.x);
-      // Reverse because after mirror, directions flip
-      const rollMirrored = -roll;
-
-      // Center of glasses for rotation
-      const gcx = (llCx + rlCx) / 2;
-      const gcy = (llCy + rlCy) / 2;
-
-      ctx.save();
-      ctx.translate(gcx, gcy);
-      ctx.rotate(rollMirrored);
-      ctx.translate(-gcx, -gcy);
-
-      // ---- LEFT LENS (screen-right, person's left) ----
-      // Bottom half: metal rim (semi-circle)
-      ctx.beginPath();
-      ctx.ellipse(llCx, llCy, llW/2, llH/2, 0, 0, Math.PI * 2);
-      ctx.fillStyle = lensColor;
-      ctx.fill();
-
-      // Metal lower rim
-      ctx.beginPath();
-      ctx.ellipse(llCx, llCy, llW/2, llH/2, 0, 0.1, Math.PI - 0.1);
-      ctx.strokeStyle = metalColor;
-      ctx.lineWidth = thick;
-      ctx.stroke();
-
-      // Browline (top half — thicker, dark)
-      ctx.beginPath();
-      ctx.ellipse(llCx, llCy, llW/2, llH/2, 0, Math.PI + 0.1, -0.1);
-      ctx.strokeStyle = browColor;
-      ctx.lineWidth = browThick;
-      ctx.stroke();
-
-      // Top accent line
-      ctx.beginPath();
-      ctx.ellipse(llCx, llCy, llW/2 + browThick*0.3, llH/2 + browThick*0.3, 0, Math.PI + 0.15, -0.15);
-      ctx.strokeStyle = frameColor;
-      ctx.lineWidth = thick * 0.5;
-      ctx.stroke();
-
-      // ---- RIGHT LENS (screen-left, person's right) ----
-      ctx.beginPath();
-      ctx.ellipse(rlCx, rlCy, rlW/2, rlH/2, 0, 0, Math.PI * 2);
-      ctx.fillStyle = lensColor;
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.ellipse(rlCx, rlCy, rlW/2, rlH/2, 0, 0.1, Math.PI - 0.1);
-      ctx.strokeStyle = metalColor;
-      ctx.lineWidth = thick;
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.ellipse(rlCx, rlCy, rlW/2, rlH/2, 0, Math.PI + 0.1, -0.1);
-      ctx.strokeStyle = browColor;
-      ctx.lineWidth = browThick;
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.ellipse(rlCx, rlCy, rlW/2 + browThick*0.3, rlH/2 + browThick*0.3, 0, Math.PI + 0.15, -0.15);
-      ctx.strokeStyle = frameColor;
-      ctx.lineWidth = thick * 0.5;
-      ctx.stroke();
-
-      // ---- NOSE BRIDGE ----
-      ctx.beginPath();
-      ctx.moveTo(p.leI.x, p.leI.y);
-      ctx.quadraticCurveTo(p.nb.x, p.nb.y + llH * 0.15, p.reI.x, p.reI.y);
-      ctx.strokeStyle = metalColor;
-      ctx.lineWidth = thick;
-      ctx.stroke();
-
-      // ---- TEMPLES / ARMS ----
-      // Left temple: from outer eye corner toward ear
-      const lTempleEnd = {
-        x: p.lT.x + (p.lT.x - llCx) * 0.15,
-        y: p.lT.y
-      };
-      ctx.beginPath();
-      ctx.moveTo(p.leO.x + (p.leO.x - llCx) * 0.3, llCy - llH * 0.15);
-      ctx.lineTo(lTempleEnd.x, lTempleEnd.y - llH * 0.1);
-      ctx.strokeStyle = browColor;
-      ctx.lineWidth = thick * 1.5;
-      ctx.stroke();
-
-      // Temple tip (ear hook)
-      ctx.beginPath();
-      ctx.moveTo(lTempleEnd.x, lTempleEnd.y - llH * 0.1);
-      ctx.quadraticCurveTo(
-        lTempleEnd.x + (lTempleEnd.x - llCx) * 0.05,
-        lTempleEnd.y + llH * 0.1,
-        lTempleEnd.x - (p.leO.x - llCx) * 0.1,
-        lTempleEnd.y + llH * 0.3
-      );
-      ctx.strokeStyle = browColor;
-      ctx.lineWidth = thick * 1.2;
-      ctx.stroke();
-
-      // Right temple
-      const rTempleEnd = {
-        x: p.rT.x + (p.rT.x - rlCx) * 0.15,
-        y: p.rT.y
-      };
-      ctx.beginPath();
-      ctx.moveTo(p.reO.x + (p.reO.x - rlCx) * 0.3, rlCy - rlH * 0.15);
-      ctx.lineTo(rTempleEnd.x, rTempleEnd.y - rlH * 0.1);
-      ctx.strokeStyle = browColor;
-      ctx.lineWidth = thick * 1.5;
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(rTempleEnd.x, rTempleEnd.y - rlH * 0.1);
-      ctx.quadraticCurveTo(
-        rTempleEnd.x + (rTempleEnd.x - rlCx) * 0.05,
-        rTempleEnd.y + rlH * 0.1,
-        rTempleEnd.x - (p.reO.x - rlCx) * 0.1,
-        rTempleEnd.y + rlH * 0.3
-      );
-      ctx.strokeStyle = browColor;
-      ctx.lineWidth = thick * 1.2;
-      ctx.stroke();
-
-      // ---- NOSE PADS (small details) ----
-      const padSize = thick * 1.5;
-      ctx.beginPath();
-      ctx.ellipse(p.nb.x - padSize*1.5, p.nb.y + llH*0.08, padSize, padSize*0.6, -0.3, 0, Math.PI*2);
-      ctx.fillStyle = metalColor;
-      ctx.fill();
-      ctx.beginPath();
-      ctx.ellipse(p.nb.x + padSize*1.5, p.nb.y + rlH*0.08, padSize, padSize*0.6, 0.3, 0, Math.PI*2);
-      ctx.fillStyle = metalColor;
-      ctx.fill();
-
-      // ---- LENS REFLECTIONS (subtle) ----
-      ctx.globalAlpha = 0.08;
-      const reflGrad1 = ctx.createLinearGradient(llCx - llW/2, llCy - llH/2, llCx + llW/4, llCy + llH/2);
-      reflGrad1.addColorStop(0, 'white');
-      reflGrad1.addColorStop(1, 'transparent');
-      ctx.beginPath();
-      ctx.ellipse(llCx, llCy, llW/2 - thick, llH/2 - thick, 0, 0, Math.PI*2);
-      ctx.fillStyle = reflGrad1;
-      ctx.fill();
-
-      const reflGrad2 = ctx.createLinearGradient(rlCx - rlW/2, rlCy - rlH/2, rlCx + rlW/4, rlCy + rlH/2);
-      reflGrad2.addColorStop(0, 'white');
-      reflGrad2.addColorStop(1, 'transparent');
-      ctx.beginPath();
-      ctx.ellipse(rlCx, rlCy, rlW/2 - thick, rlH/2 - thick, 0, 0, Math.PI*2);
-      ctx.fillStyle = reflGrad2;
-      ctx.fill();
-
-      ctx.globalAlpha = 1.0;
-      ctx.restore();
     }
 
     function capturePhoto() {
-      const canvas = document.getElementById('tryonCanvas');
+      const sceneEl = document.getElementById('tryonScene');
+      if (!sceneEl || !sceneEl.canvas) return;
+
+      // Force a render frame
+      sceneEl.renderer.render(sceneEl.object3D, sceneEl.camera);
+
       const link = document.createElement('a');
       link.download = 'visiomais-provador-virtual.png';
-      link.href = canvas.toDataURL('image/png');
+      link.href = sceneEl.canvas.toDataURL('image/png');
       link.click();
-    }
-
-    async function flipCamera() {
-      currentFacing = currentFacing === 'user' ? 'environment' : 'user';
-      if (tryonCamera) { tryonCamera.stop(); tryonCamera = null; }
-      const video = document.getElementById('tryonVideo');
-      if (video.srcObject) {
-        video.srcObject.getTracks().forEach(t => t.stop());
-        video.srcObject = null;
-      }
-      SM.init = false;
-      await initTryOn();
     }
 
     document.addEventListener('keydown', (e) => {
