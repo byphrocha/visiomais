@@ -706,52 +706,53 @@
       const w = canvas.width;
       const h = canvas.height;
 
-      // Key face landmarks for glasses positioning
-      // 33: left eye inner, 133: left eye outer, 362: right eye inner, 263: right eye outer
-      // 168: nose bridge top, 6: nose bridge mid
+      // Key landmarks
       const leftEyeOuter = landmarks[33];
-      const leftEyeInner = landmarks[133];
-      const rightEyeInner = landmarks[362];
       const rightEyeOuter = landmarks[263];
       const noseBridge = landmarks[168];
       const leftTemple = landmarks[234];
       const rightTemple = landmarks[454];
-      const leftEyeTop = landmarks[159];
-      const leftEyeBottom = landmarks[145];
 
-      // Calculate glasses dimensions using temple-to-temple for full width
-      const templeWidth = Math.hypot(
-        (rightTemple.x - leftTemple.x) * w,
-        (rightTemple.y - leftTemple.y) * h
-      );
+      // Use eye-to-eye width for glasses sizing
       const eyeWidth = Math.hypot(
         (rightEyeOuter.x - leftEyeOuter.x) * w,
         (rightEyeOuter.y - leftEyeOuter.y) * h
       );
 
-      // Center point between eyes
+      // Center point between eyes at nose bridge height
       const cx = ((leftEyeOuter.x + rightEyeOuter.x) / 2) * w;
       const cy = noseBridge.y * h;
 
-      // Rotation angle based on eye line
+      // Rotation angle
       const angle = Math.atan2(
         (rightEyeOuter.y - leftEyeOuter.y) * h,
         (rightEyeOuter.x - leftEyeOuter.x) * w
       );
 
+      if (!glassesImgLoaded) return;
+
       ctx.save();
       ctx.translate(cx, cy);
       ctx.rotate(angle);
 
-      // Draw glasses image overlay
-      if (glassesImgLoaded) {
-        const imgAspect = glassesImg.naturalWidth / glassesImg.naturalHeight;
-        // Scale to match face width (temple to temple)
-        const drawW = templeWidth * 1.1;
-        const drawH = drawW / imgAspect;
-        // Center vertically on eye line, slight offset down for nose bridge
-        ctx.drawImage(glassesImg, -drawW / 2, -drawH * 0.4, drawW, drawH);
-      }
+      // Crop only the front part of the glasses (exclude temple arms)
+      // Source image: crop from 8% to 92% width to remove side temples
+      const srcW = glassesImg.naturalWidth;
+      const srcH = glassesImg.naturalHeight;
+      const cropX = srcW * 0.08;
+      const cropW = srcW * 0.84;
+      const cropH = srcH;
+
+      // Scale glasses to match eye width with some padding
+      const drawW = eyeWidth * 1.6;
+      const drawH = drawW * (cropH / cropW);
+
+      // Draw cropped glasses centered on face
+      ctx.drawImage(
+        glassesImg,
+        cropX, 0, cropW, cropH,           // source crop
+        -drawW / 2, -drawH * 0.42, drawW, drawH  // destination
+      );
 
       ctx.restore();
     }
