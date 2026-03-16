@@ -609,16 +609,42 @@
     let tryonActive = false;
     let currentFacing = 'user';
 
-    // Glasses image overlay
+    // Glasses overlay — front-view SVG (no temples, symmetric)
     const glassesImg = new Image();
     let glassesImgLoaded = false;
     glassesImg.onload = () => { glassesImgLoaded = true; };
-    glassesImg.src = 'glasses-tryon.png';
+    const _svgOverlay = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 170">
+      <defs>
+        <linearGradient id="browL" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a2a2a"/><stop offset="100%" stop-color="#111"/></linearGradient>
+        <linearGradient id="metalRim" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c8c8c8"/><stop offset="100%" stop-color="#999"/></linearGradient>
+      </defs>
+      <!-- Left lens -->
+      <rect x="15" y="12" width="172" height="132" rx="16" fill="rgba(220,235,255,0.06)" stroke="url(#metalRim)" stroke-width="2.5"/>
+      <path d="M13,60 L13,32 Q13,10 44,10 L162,10 Q189,10 189,32 L189,60" fill="url(#browL)"/>
+      <path d="M13,60 L189,60" stroke="#333" stroke-width="1"/>
+      <ellipse cx="90" cy="70" rx="45" ry="22" fill="rgba(255,255,255,0.035)" transform="rotate(-12 90 70)"/>
+      <!-- Right lens -->
+      <rect x="233" y="12" width="172" height="132" rx="16" fill="rgba(220,235,255,0.06)" stroke="url(#metalRim)" stroke-width="2.5"/>
+      <path d="M231,60 L231,32 Q231,10 262,10 L380,10 Q407,10 407,32 L407,60" fill="url(#browL)"/>
+      <path d="M231,60 L407,60" stroke="#333" stroke-width="1"/>
+      <ellipse cx="330" cy="70" rx="45" ry="22" fill="rgba(255,255,255,0.035)" transform="rotate(-12 330 70)"/>
+      <!-- Bridge -->
+      <path d="M189,36 Q210,22 231,36" fill="none" stroke="#bbb" stroke-width="3.5" stroke-linecap="round"/>
+      <!-- Nose pads -->
+      <path d="M192,50 Q188,68 183,88" fill="none" stroke="#bbb" stroke-width="2" stroke-linecap="round"/>
+      <path d="M228,50 Q232,68 237,88" fill="none" stroke="#bbb" stroke-width="2" stroke-linecap="round"/>
+      <ellipse cx="181" cy="90" rx="5" ry="8" fill="none" stroke="#bbb" stroke-width="1.5"/>
+      <ellipse cx="239" cy="90" rx="5" ry="8" fill="none" stroke="#bbb" stroke-width="1.5"/>
+      <!-- Rivets -->
+      <circle cx="30" cy="40" r="3.5" fill="#d0d0d0" stroke="#aaa" stroke-width="0.5"/>
+      <circle cx="390" cy="40" r="3.5" fill="#d0d0d0" stroke="#aaa" stroke-width="0.5"/>
+    </svg>`;
+    glassesImg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(_svgOverlay);
 
     // Smooth tracking state
     let smoothCx = 0, smoothCy = 0, smoothAngle = 0, smoothW = 0;
     let smoothInitialized = false;
-    const SMOOTH = 0.4;
+    const SMOOTH = 0.7;
 
     function openTryOn() {
       const modal = document.getElementById('tryonModal');
@@ -710,48 +736,42 @@
       }
       ctx.clearRect(0, 0, vw, vh);
 
-      if (!results.multiFaceLandmarks || !results.multiFaceLandmarks.length) return;
+      if (!results.multiFaceLandmarks || !results.multiFaceLandmarks.length) {
+        smoothInitialized = false;
+        return;
+      }
       if (!glassesImgLoaded) return;
 
       const lm = results.multiFaceLandmarks[0];
 
-      // Key landmarks (normalized 0-1)
-      const leO = lm[33];   // left eye outer
-      const reO = lm[263];  // right eye outer
-      const nose = lm[168]; // nose bridge top
-      const lT = lm[234];   // left temple
-      const rT = lm[454];   // right temple
+      // Key landmarks
+      const leO = lm[33];   // left eye outer corner
+      const reO = lm[263];  // right eye outer corner
+      const leI = lm[133];  // left eye inner corner
+      const reI = lm[362];  // right eye inner corner
+      const lT = lm[234];   // left temple (ear)
+      const rT = lm[454];   // right temple (ear)
 
-      // Convert to pixel coords
-      const leftEyeX = leO.x * vw;
-      const leftEyeY = leO.y * vh;
-      const rightEyeX = reO.x * vw;
-      const rightEyeY = reO.y * vh;
-      const noseX = nose.x * vw;
-      const noseY = nose.y * vh;
+      // Pixel coordinates
+      const lx = leO.x * vw, ly = leO.y * vh;
+      const rx = reO.x * vw, ry = reO.y * vh;
+      const lix = leI.x * vw, liy = leI.y * vh;
+      const rix = reI.x * vw, riy = reI.y * vh;
 
-      // Center between eyes, slightly above toward nose bridge
-      const rawCx = (leftEyeX + rightEyeX) / 2;
-      const rawCy = (leftEyeY + rightEyeY) / 2 * 0.65 + noseY * 0.35;
+      // Center between outer eye corners
+      const rawCx = (lx + rx) / 2;
+      const rawCy = (ly + ry) / 2;
 
-      // Temple-to-temple for width (wider than eye-to-eye)
-      const templeW = Math.hypot((rT.x - lT.x) * vw, (rT.y - lT.y) * vh);
+      // Width: temple-to-temple distance, scaled up slightly
+      const rawW = Math.hypot((rT.x - lT.x) * vw, (rT.y - lT.y) * vh) * 1.25;
 
-      // Eye-to-eye distance
-      const eyeW = Math.hypot(rightEyeX - leftEyeX, rightEyeY - leftEyeY);
+      // Head tilt angle from eye corners
+      const rawAngle = Math.atan2(ry - ly, rx - lx);
 
-      // Use temple width for sizing (gives better coverage)
-      const rawW = templeW * 1.15;
-
-      // Head tilt angle
-      const rawAngle = Math.atan2(rightEyeY - leftEyeY, rightEyeX - leftEyeX);
-
-      // Initialize smooth values on first detection (avoid lerp from 0,0)
+      // Smooth interpolation (instant on first frame)
       if (!smoothInitialized) {
-        smoothCx = rawCx;
-        smoothCy = rawCy;
-        smoothAngle = rawAngle;
-        smoothW = rawW;
+        smoothCx = rawCx; smoothCy = rawCy;
+        smoothAngle = rawAngle; smoothW = rawW;
         smoothInitialized = true;
       } else {
         smoothCx += (rawCx - smoothCx) * SMOOTH;
@@ -760,18 +780,16 @@
         smoothW += (rawW - smoothW) * SMOOTH;
       }
 
-      // Glasses dimensions maintaining aspect ratio
+      // Draw glasses maintaining aspect ratio
       const drawW = smoothW;
       const imgAspect = glassesImg.naturalWidth / glassesImg.naturalHeight;
       const drawH = drawW / imgAspect;
 
+      // The SVG eye-line is at ~42% from top, so offset to align with detected eyes
       ctx.save();
       ctx.translate(smoothCx, smoothCy);
       ctx.rotate(smoothAngle);
-      ctx.drawImage(
-        glassesImg,
-        -drawW / 2, -drawH * 0.45, drawW, drawH
-      );
+      ctx.drawImage(glassesImg, -drawW / 2, -drawH * 0.42, drawW, drawH);
       ctx.restore();
     }
 
