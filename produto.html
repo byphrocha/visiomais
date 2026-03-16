@@ -610,15 +610,11 @@
     let tryonActive = false;
     let currentFacing = 'user';
 
-    // Glasses drawing config - adjust per product
-    const glassesConfig = {
-      frameColor: '#1858C8',
-      frameWidth: 5,
-      lensColor: 'rgba(24,88,200,0.08)',
-      bridgeColor: '#1858C8',
-      templeColor: '#1858C8',
-      style: 'clubmaster' // clubmaster, round, square, rectangular
-    };
+    // Glasses image overlay - uses real glasses photo PNG
+    const glassesImg = new Image();
+    let glassesImgLoaded = false;
+    glassesImg.onload = () => { glassesImgLoaded = true; };
+    glassesImg.src = 'glasses-tryon.png';
 
     function openTryOn() {
       const modal = document.getElementById('tryonModal');
@@ -748,103 +744,15 @@
       ctx.translate(cx, cy);
       ctx.rotate(angle);
 
-      const fc = glassesConfig.frameColor;
-      const fw = glassesConfig.frameWidth;
-      const lc = glassesConfig.lensColor;
-
-      // Choose drawing style
-      drawGlasses(ctx, glassesWidth, lensWidth, lensHeight, bridgeWidth, fc, fw, lc);
+      // Draw glasses image overlay
+      if (glassesImgLoaded) {
+        const imgAspect = glassesImg.naturalWidth / glassesImg.naturalHeight;
+        const drawW = glassesWidth * 1.35;
+        const drawH = drawW / imgAspect;
+        ctx.drawImage(glassesImg, -drawW / 2, -drawH / 2 + drawH * 0.05, drawW, drawH);
+      }
 
       ctx.restore();
-    }
-
-    function drawGlasses(ctx, gw, lw, lh, bw, fc, fw, lc) {
-      const halfGW = gw / 2;
-      const style = glassesConfig.style;
-
-      // Left lens
-      const leftLensX = -halfGW + lw * 0.1;
-      const rightLensX = halfGW - lw * 1.1;
-      const lensY = -lh / 2;
-
-      ctx.lineWidth = fw;
-      ctx.strokeStyle = fc;
-      ctx.fillStyle = lc;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-
-      let rx;
-      if (style === 'clubmaster') rx = lh * 0.35;
-      else if (style === 'round') rx = lh * 0.5;
-      else if (style === 'square') rx = lh * 0.12;
-      else rx = lh * 0.2;
-
-      // Draw left lens
-      drawRoundedRect(ctx, leftLensX, lensY, lw, lh, rx);
-      ctx.fill();
-      ctx.stroke();
-
-      // Draw right lens
-      drawRoundedRect(ctx, rightLensX, lensY, lw, lh, rx);
-      ctx.fill();
-      ctx.stroke();
-
-      // Bridge
-      ctx.beginPath();
-      ctx.moveTo(leftLensX + lw, 0);
-      ctx.quadraticCurveTo(0, -lh * 0.15, rightLensX, 0);
-      ctx.stroke();
-
-      // Temples (arms) - subtle lines going to ears
-      const templeLen = gw * 0.25;
-      ctx.lineWidth = fw * 0.7;
-
-      // Left temple
-      ctx.beginPath();
-      ctx.moveTo(leftLensX, 0);
-      ctx.lineTo(leftLensX - templeLen, lh * 0.15);
-      ctx.stroke();
-
-      // Right temple
-      ctx.beginPath();
-      ctx.moveTo(rightLensX + lw, 0);
-      ctx.lineTo(rightLensX + lw + templeLen, lh * 0.15);
-      ctx.stroke();
-
-      // Clubmaster style: thicker top frame
-      if (style === 'clubmaster') {
-        ctx.lineWidth = fw * 1.8;
-        ctx.beginPath();
-        ctx.moveTo(leftLensX, lensY + rx);
-        ctx.lineTo(leftLensX, lensY + rx * 0.3);
-        ctx.quadraticCurveTo(leftLensX, lensY, leftLensX + rx, lensY);
-        ctx.lineTo(leftLensX + lw - rx, lensY);
-        ctx.quadraticCurveTo(leftLensX + lw, lensY, leftLensX + lw, lensY + rx * 0.3);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(rightLensX, lensY + rx);
-        ctx.lineTo(rightLensX, lensY + rx * 0.3);
-        ctx.quadraticCurveTo(rightLensX, lensY, rightLensX + rx, lensY);
-        ctx.lineTo(rightLensX + lw - rx, lensY);
-        ctx.quadraticCurveTo(rightLensX + lw, lensY, rightLensX + lw, lensY + rx * 0.3);
-        ctx.stroke();
-      }
-    }
-
-    function drawRoundedRect(ctx, x, y, w, h, r) {
-      r = Math.min(r, w / 2, h / 2);
-      ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.lineTo(x + w - r, y);
-      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-      ctx.lineTo(x + w, y + h - r);
-      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-      ctx.lineTo(x + r, y + h);
-      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-      ctx.lineTo(x, y + r);
-      ctx.quadraticCurveTo(x, y, x + r, y);
-      ctx.closePath();
     }
 
     function capturePhoto() {
