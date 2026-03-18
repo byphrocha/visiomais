@@ -688,25 +688,21 @@
             <a-sphere position="0.05 -0.09 0.04" radius="0.012"
               material="shader:flat; color:#d8d8d8"></a-sphere>
 
-            <!-- LEFT TEMPLE (pivoted at hinge, rotated inward toward ear) -->
-            <a-entity position="-0.385 0.04 -0.05" rotation="0 7 0">
-              <a-box position="0 0 0" width="0.03" height="0.03" depth="0.04"
-                material="shader:flat; color:#a0a0a0"></a-box>
-              <a-box position="-0.005 0 -0.45" width="0.02" height="0.025" depth="0.55"
-                material="shader:flat; color:#1a0e08"></a-box>
-              <a-box position="-0.005 -0.06 -0.72" width="0.02" height="0.14" depth="0.025"
-                material="shader:flat; color:#1a0e08"></a-box>
-            </a-entity>
+            <!-- LEFT TEMPLE ARM (angled inward via position offset) -->
+            <a-box position="-0.385 0.04 -0.05" width="0.03" height="0.03" depth="0.04"
+              material="shader:flat; color:#a0a0a0"></a-box>
+            <a-box position="-0.39 0.04 -0.45" width="0.02" height="0.025" depth="0.50"
+              material="shader:flat; color:#1a0e08"></a-box>
+            <a-box position="-0.39 -0.02 -0.72" width="0.02" height="0.14" depth="0.025"
+              material="shader:flat; color:#1a0e08"></a-box>
 
-            <!-- RIGHT TEMPLE (pivoted at hinge, rotated inward toward ear) -->
-            <a-entity position="0.385 0.04 -0.05" rotation="0 -7 0">
-              <a-box position="0 0 0" width="0.03" height="0.03" depth="0.04"
-                material="shader:flat; color:#a0a0a0"></a-box>
-              <a-box position="0.005 0 -0.45" width="0.02" height="0.025" depth="0.55"
-                material="shader:flat; color:#1a0e08"></a-box>
-              <a-box position="0.005 -0.06 -0.72" width="0.02" height="0.14" depth="0.025"
-                material="shader:flat; color:#1a0e08"></a-box>
-            </a-entity>
+            <!-- RIGHT TEMPLE ARM (angled inward via position offset) -->
+            <a-box position="0.385 0.04 -0.05" width="0.03" height="0.03" depth="0.04"
+              material="shader:flat; color:#a0a0a0"></a-box>
+            <a-box position="0.39 0.04 -0.45" width="0.02" height="0.025" depth="0.50"
+              material="shader:flat; color:#1a0e08"></a-box>
+            <a-box position="0.39 -0.02 -0.72" width="0.02" height="0.14" depth="0.025"
+              material="shader:flat; color:#1a0e08"></a-box>
 
           </a-entity>
         </a-entity>
@@ -714,7 +710,7 @@
         <!-- Structural eye outer corners (bone-fixed, no gaze influence) -->
         <a-entity mindar-face-target="anchorIndex: 33" id="eyeLeftOuter" visible="false"></a-entity>
         <a-entity mindar-face-target="anchorIndex: 263" id="eyeRightOuter" visible="false"></a-entity>
-        <!-- Face width landmarks (lateral cheekbone points) -->
+        <!-- Face width landmarks kept for potential future use -->
         <a-entity mindar-face-target="anchorIndex: 234" id="faceLeftSide" visible="false"></a-entity>
         <a-entity mindar-face-target="anchorIndex: 454" id="faceRightSide" visible="false"></a-entity>
       `;
@@ -733,41 +729,28 @@
         const noseAnchor = document.getElementById('faceAnchor');
         const leftEye = document.getElementById('eyeLeftOuter');
         const rightEye = document.getElementById('eyeRightOuter');
-        const faceLeft = document.getElementById('faceLeftSide');
-        const faceRight = document.getElementById('faceRightSide');
         const glasses = document.getElementById('glassesModel');
-        if (!noseAnchor || !leftEye || !rightEye || !faceLeft || !faceRight || !glasses) return;
+        if (!noseAnchor || !leftEye || !rightEye || !glasses) return;
 
         // Hide glasses until calibration is complete — prevents visual "jump"
         glasses.object3D.visible = false;
 
         const lEyePos = new THREE.Vector3();
         const rEyePos = new THREE.Vector3();
-        const faceLeftPos = new THREE.Vector3();
-        const faceRightPos = new THREE.Vector3();
         const eyeCenter = new THREE.Vector3();
         const eyeCenterLocal = new THREE.Vector3();
-        const faceLeftLocal = new THREE.Vector3();
-        const faceRightLocal = new THREE.Vector3();
         const inverseMatrix = new THREE.Matrix4();
 
-        // Calibration: collect samples then freeze
+        // Position-only calibration: collect samples then freeze
+        // No dynamic scaling — model dimensions are designed for MindAR's coordinate space
         const CALIBRATION_FRAMES = 30;
         let calibrationCount = 0;
         let sumY = 0;
         let sumX = 0;
-        let sumFaceWidth = 0;
         let calibratedY = -0.09; // fallback
         let calibratedX = 0;
-        let calibratedScale = 1;
         let calibrationDone = false;
         const BLEND_FACTOR = 0.4;
-        const REF_FACE_WIDTH = 0.82;
-        const SCALE_CORRECTION = 0.6;
-
-        // Fade-in animation after calibration
-        let fadeProgress = 0;
-        const FADE_SPEED = 0.05; // 20 frames to fully appear
 
         function calibrationTick() {
           if (!tryonActive) return;
@@ -776,71 +759,40 @@
             // Glasses hidden during calibration — no visual output
             leftEye.object3D.getWorldPosition(lEyePos);
             rightEye.object3D.getWorldPosition(rEyePos);
-            faceLeft.object3D.getWorldPosition(faceLeftPos);
-            faceRight.object3D.getWorldPosition(faceRightPos);
 
             eyeCenter.lerpVectors(lEyePos, rEyePos, 0.5);
 
             inverseMatrix.copy(noseAnchor.object3D.matrixWorld).invert();
             eyeCenterLocal.copy(eyeCenter).applyMatrix4(inverseMatrix);
-            faceLeftLocal.copy(faceLeftPos).applyMatrix4(inverseMatrix);
-            faceRightLocal.copy(faceRightPos).applyMatrix4(inverseMatrix);
-
-            const faceWidth = faceLeftLocal.distanceTo(faceRightLocal);
 
             sumY += eyeCenterLocal.y;
             sumX += eyeCenterLocal.x;
-            sumFaceWidth += faceWidth;
             calibrationCount++;
 
             if (calibrationCount >= CALIBRATION_FRAMES) {
               const avgY = sumY / calibrationCount;
               const avgX = sumX / calibrationCount;
-              const avgFaceWidth = sumFaceWidth / calibrationCount;
               calibratedY = avgY * BLEND_FACTOR;
               calibratedX = avgX * BLEND_FACTOR;
-              calibratedScale = (avgFaceWidth / REF_FACE_WIDTH) * SCALE_CORRECTION;
-              calibratedScale = Math.max(0.7, Math.min(1.3, calibratedScale));
               calibrationDone = true;
 
-              // Apply final calibrated values before showing
+              // Apply final calibrated position before showing
               glasses.object3D.position.y = calibratedY;
               glasses.object3D.position.x = calibratedX;
-              glasses.object3D.scale.set(calibratedScale, calibratedScale, calibratedScale);
-              // Make visible and start fade-in
+              // Show glasses — already at correct position
               glasses.object3D.visible = true;
             }
           } else {
-            // After calibration: fixed offset + scale, fully head-locked
+            // After calibration: fixed offset, fully head-locked, scale=1
             glasses.object3D.position.y = calibratedY;
             glasses.object3D.position.x = calibratedX;
-
-            // Smooth fade-in via opacity on all child materials
-            if (fadeProgress < 1) {
-              fadeProgress = Math.min(1, fadeProgress + FADE_SPEED);
-              glasses.object3D.traverse(function(child) {
-                if (child.material) {
-                  child.material.opacity = child.material._targetOpacity !== undefined
-                    ? child.material._targetOpacity * fadeProgress
-                    : fadeProgress;
-                  child.material.transparent = true;
-                }
-              });
-            }
           }
 
           requestAnimationFrame(calibrationTick);
         }
 
-        // Store original opacities before fade-in starts
-        setTimeout(() => {
-          glasses.object3D.traverse(function(child) {
-            if (child.material) {
-              child.material._targetOpacity = child.material.opacity !== undefined ? child.material.opacity : 1;
-            }
-          });
-          requestAnimationFrame(calibrationTick);
-        }, 1000);
+        // Wait for anchors to initialize, then start calibration
+        setTimeout(() => requestAnimationFrame(calibrationTick), 1000);
       }
 
       // Listen for AR events
