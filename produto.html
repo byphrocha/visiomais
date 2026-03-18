@@ -714,6 +714,9 @@
         <!-- Structural eye outer corners (bone-fixed, no gaze influence) -->
         <a-entity mindar-face-target="anchorIndex: 33" id="eyeLeftOuter" visible="false"></a-entity>
         <a-entity mindar-face-target="anchorIndex: 263" id="eyeRightOuter" visible="false"></a-entity>
+        <!-- Face width landmarks (lateral cheekbone points) -->
+        <a-entity mindar-face-target="anchorIndex: 234" id="faceLeftSide" visible="false"></a-entity>
+        <a-entity mindar-face-target="anchorIndex: 454" id="faceRightSide" visible="false"></a-entity>
       `;
 
       container.insertBefore(sceneEl, loading);
@@ -730,15 +733,19 @@
         const noseAnchor = document.getElementById('faceAnchor');
         const leftEye = document.getElementById('eyeLeftOuter');
         const rightEye = document.getElementById('eyeRightOuter');
+        const faceLeft = document.getElementById('faceLeftSide');
+        const faceRight = document.getElementById('faceRightSide');
         const glasses = document.getElementById('glassesModel');
-        if (!noseAnchor || !leftEye || !rightEye || !glasses) return;
+        if (!noseAnchor || !leftEye || !rightEye || !faceLeft || !faceRight || !glasses) return;
 
         const lEyePos = new THREE.Vector3();
         const rEyePos = new THREE.Vector3();
+        const faceLeftPos = new THREE.Vector3();
+        const faceRightPos = new THREE.Vector3();
         const eyeCenter = new THREE.Vector3();
         const eyeCenterLocal = new THREE.Vector3();
-        const lEyeLocal = new THREE.Vector3();
-        const rEyeLocal = new THREE.Vector3();
+        const faceLeftLocal = new THREE.Vector3();
+        const faceRightLocal = new THREE.Vector3();
         const inverseMatrix = new THREE.Matrix4();
 
         // Calibration: collect samples then freeze
@@ -746,22 +753,26 @@
         let calibrationCount = 0;
         let sumY = 0;
         let sumX = 0;
-        let sumEyeDist = 0;
+        let sumFaceWidth = 0;
         let calibratedY = -0.09; // fallback
         let calibratedX = 0;
         let calibratedScale = 1;
         let calibrationDone = false;
         const BLEND_FACTOR = 0.4;
-        // Reference inter-eye distance in model space (lens centers at ±0.21)
-        const REF_EYE_DIST = 0.42;
+        // Reference face width: model total width is ~0.82 (hinges at ±0.385)
+        // Face width landmarks (234/454) measure actual head width
+        const REF_FACE_WIDTH = 0.82;
+        const SCALE_CORRECTION = 0.6; // Correction factor for unit mismatch
 
         function calibrationTick() {
           if (!tryonActive) return;
 
           if (!calibrationDone) {
-            // Get eye positions in world space
+            // Get positions in world space
             leftEye.object3D.getWorldPosition(lEyePos);
             rightEye.object3D.getWorldPosition(rEyePos);
+            faceLeft.object3D.getWorldPosition(faceLeftPos);
+            faceRight.object3D.getWorldPosition(faceRightPos);
 
             // Eye center in world space
             eyeCenter.lerpVectors(lEyePos, rEyePos, 0.5);
@@ -769,29 +780,29 @@
             // Convert all points to nose anchor's LOCAL space using full inverse world matrix
             inverseMatrix.copy(noseAnchor.object3D.matrixWorld).invert();
             eyeCenterLocal.copy(eyeCenter).applyMatrix4(inverseMatrix);
-            lEyeLocal.copy(lEyePos).applyMatrix4(inverseMatrix);
-            rEyeLocal.copy(rEyePos).applyMatrix4(inverseMatrix);
+            faceLeftLocal.copy(faceLeftPos).applyMatrix4(inverseMatrix);
+            faceRightLocal.copy(faceRightPos).applyMatrix4(inverseMatrix);
 
-            // Inter-eye distance in local space (for dynamic scaling)
-            const eyeDist = lEyeLocal.distanceTo(rEyeLocal);
+            // Face width in local space (lateral cheekbone points — true head width)
+            const faceWidth = faceLeftLocal.distanceTo(faceRightLocal);
 
             // Accumulate samples
             sumY += eyeCenterLocal.y;
             sumX += eyeCenterLocal.x;
-            sumEyeDist += eyeDist;
+            sumFaceWidth += faceWidth;
             calibrationCount++;
 
             if (calibrationCount >= CALIBRATION_FRAMES) {
               // Average the samples and apply blend factor
               const avgY = sumY / calibrationCount;
               const avgX = sumX / calibrationCount;
-              const avgEyeDist = sumEyeDist / calibrationCount;
+              const avgFaceWidth = sumFaceWidth / calibrationCount;
               calibratedY = avgY * BLEND_FACTOR;
               calibratedX = avgX * BLEND_FACTOR;
-              // Scale glasses to match face width
-              calibratedScale = avgEyeDist / REF_EYE_DIST;
+              // Scale glasses to match face width with correction factor
+              calibratedScale = (avgFaceWidth / REF_FACE_WIDTH) * SCALE_CORRECTION;
               // Clamp scale to reasonable range
-              calibratedScale = Math.max(0.7, Math.min(1.5, calibratedScale));
+              calibratedScale = Math.max(0.7, Math.min(1.3, calibratedScale));
               calibrationDone = true;
               glasses.object3D.scale.set(calibratedScale, calibratedScale, calibratedScale);
             }
