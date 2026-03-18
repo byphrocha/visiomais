@@ -638,31 +638,26 @@
       sceneEl.setAttribute('loading-screen', 'enabled: false');
       sceneEl.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;';
 
-      // Build the scene HTML with 3D Clubmaster glasses
+      // Build the scene HTML with eye-landmark-based positioning
       sceneEl.innerHTML = `
         <a-camera active="false" position="0 0 0" look-controls="enabled: false"></a-camera>
 
-        <a-entity mindar-face-target="anchorIndex: 168">
-          <a-entity id="glassesModel" position="0 -0.12 0.08">
+        <!-- Anchor at nose bridge (provides base rotation/position) -->
+        <a-entity mindar-face-target="anchorIndex: 168" id="noseBridgeAnchor">
+          <a-entity id="glassesModel" position="0 0 0.08">
 
             <!-- LEFT LENS GROUP -->
             <a-entity position="-0.21 0 0">
-              <!-- Browline (dark tortoise acetate) -->
               <a-box position="0 0.06 0" width="0.38" height="0.04" depth="0.03"
                 material="shader:flat; color:#1a0e08"></a-box>
-              <!-- Browline accent top -->
               <a-box position="0 0.085 -0.005" width="0.36" height="0.015" depth="0.025"
                 material="shader:flat; color:#3d2517"></a-box>
-              <!-- Lens (transparent) -->
               <a-plane position="0 0 0.015" width="0.34" height="0.22"
                 material="shader:flat; color:#c8e0ff; opacity:0.08; side:double"></a-plane>
-              <!-- Bottom rim (very thin wire) -->
               <a-box position="0 -0.10 0" width="0.36" height="0.005" depth="0.008"
                 material="shader:flat; color:#c0c0c0"></a-box>
-              <!-- Left side rim wire -->
               <a-box position="-0.175 -0.02 0" width="0.005" height="0.16" depth="0.008"
                 material="shader:flat; color:#c0c0c0"></a-box>
-              <!-- Right side rim wire (near bridge) -->
               <a-box position="0.175 -0.02 0" width="0.005" height="0.16" depth="0.008"
                 material="shader:flat; color:#c0c0c0"></a-box>
             </a-entity>
@@ -693,21 +688,19 @@
             <a-sphere position="0.05 -0.09 0.04" radius="0.012"
               material="shader:flat; color:#d8d8d8"></a-sphere>
 
-            <!-- LEFT TEMPLE ARM (starts behind hinge, extends backward) -->
+            <!-- LEFT TEMPLE ARM -->
             <a-box position="-0.39 0.04 -0.45" width="0.02" height="0.025" depth="0.65"
               material="shader:flat; color:#1a0e08"></a-box>
-            <!-- Left temple tip -->
             <a-box position="-0.39 -0.02 -0.77" width="0.02" height="0.14" depth="0.025"
               material="shader:flat; color:#1a0e08"></a-box>
 
             <!-- RIGHT TEMPLE ARM -->
             <a-box position="0.39 0.04 -0.45" width="0.02" height="0.025" depth="0.65"
               material="shader:flat; color:#1a0e08"></a-box>
-            <!-- Right temple tip -->
             <a-box position="0.39 -0.02 -0.77" width="0.02" height="0.14" depth="0.025"
               material="shader:flat; color:#1a0e08"></a-box>
 
-            <!-- HINGES (small, at frame edge) -->
+            <!-- HINGES -->
             <a-box position="-0.385 0.04 -0.01" width="0.03" height="0.03" depth="0.04"
               material="shader:flat; color:#a0a0a0"></a-box>
             <a-box position="0.385 0.04 -0.01" width="0.03" height="0.03" depth="0.04"
@@ -715,13 +708,65 @@
 
           </a-entity>
         </a-entity>
+
+        <!-- Invisible eye reference anchors for dynamic Y alignment -->
+        <a-entity mindar-face-target="anchorIndex: 159" id="leftEyeAnchor" visible="false"></a-entity>
+        <a-entity mindar-face-target="anchorIndex: 386" id="rightEyeAnchor" visible="false"></a-entity>
       `;
 
       container.insertBefore(sceneEl, loading);
 
+      // Dynamic eye-based alignment system
+      let alignmentStarted = false;
+      function startEyeAlignment() {
+        if (alignmentStarted) return;
+        alignmentStarted = true;
+
+        const noseAnchor = document.getElementById('noseBridgeAnchor');
+        const leftEye = document.getElementById('leftEyeAnchor');
+        const rightEye = document.getElementById('rightEyeAnchor');
+        const glasses = document.getElementById('glassesModel');
+        if (!noseAnchor || !leftEye || !rightEye || !glasses) return;
+
+        const anchorWorldPos = new THREE.Vector3();
+        const leftEyeWorldPos = new THREE.Vector3();
+        const rightEyeWorldPos = new THREE.Vector3();
+        const eyeCenter = new THREE.Vector3();
+        const offset = new THREE.Vector3();
+        const inverseQuat = new THREE.Quaternion();
+
+        function alignTick() {
+          if (!tryonActive) return;
+
+          noseAnchor.object3D.getWorldPosition(anchorWorldPos);
+          leftEye.object3D.getWorldPosition(leftEyeWorldPos);
+          rightEye.object3D.getWorldPosition(rightEyeWorldPos);
+
+          // Calculate eye center (midpoint between eyes)
+          eyeCenter.lerpVectors(leftEyeWorldPos, rightEyeWorldPos, 0.5);
+
+          // Compute offset from nose anchor to eye center in anchor's local space
+          offset.copy(eyeCenter).sub(anchorWorldPos);
+          noseAnchor.object3D.getWorldQuaternion(inverseQuat);
+          inverseQuat.invert();
+          offset.applyQuaternion(inverseQuat);
+
+          // Apply only X and Y offset (keep Z as forward offset for glasses)
+          glasses.object3D.position.x = offset.x;
+          glasses.object3D.position.y = offset.y;
+          // Z stays at 0.08 (forward from face)
+
+          requestAnimationFrame(alignTick);
+        }
+
+        // Wait a bit for anchors to initialize
+        setTimeout(() => { requestAnimationFrame(alignTick); }, 500);
+      }
+
       // Listen for AR events
       sceneEl.addEventListener('arReady', () => {
         loading.style.display = 'none';
+        startEyeAlignment();
       });
 
       sceneEl.addEventListener('arError', () => {
