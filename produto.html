@@ -638,7 +638,8 @@
       sceneEl.setAttribute('loading-screen', 'enabled: false');
       sceneEl.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;';
 
-      // Build scene — head-locked via anchor 168 with pitch-compensated Y offset
+      // Build scene — hybrid multi-landmark system
+      // Anchor 168 (nose bridge) for rotation + eye corners (33/263) for Y correction
       sceneEl.innerHTML = `
         <a-camera active="false" position="0 0 0" look-controls="enabled: false"></a-camera>
 
@@ -707,54 +708,81 @@
 
           </a-entity>
         </a-entity>
+
+        <!-- Structural eye outer corners (bone-fixed, no gaze influence) -->
+        <a-entity mindar-face-target="anchorIndex: 33" id="eyeLeftOuter" visible="false"></a-entity>
+        <a-entity mindar-face-target="anchorIndex: 263" id="eyeRightOuter" visible="false"></a-entity>
       `;
 
       container.insertBefore(sceneEl, loading);
 
-      // Pitch-compensated Y offset (head-locked, NOT eye-locked)
-      // Compensates for nose-to-eye offset varying with head tilt
-      let pitchStarted = false;
-      function startPitchCompensation() {
-        if (pitchStarted) return;
-        pitchStarted = true;
+      // Hybrid multi-landmark alignment system
+      // - Rotation: from anchor 168 (nose bridge) — fully head-locked
+      // - Y position: blended from nose + eye outer corners — corrects structural bias
+      // - Smoothing: heavy temporal lerp — eliminates jitter
+      let alignStarted = false;
+      function startHybridAlignment() {
+        if (alignStarted) return;
+        alignStarted = true;
 
-        const anchor = document.getElementById('faceAnchor');
+        const noseAnchor = document.getElementById('faceAnchor');
+        const leftEye = document.getElementById('eyeLeftOuter');
+        const rightEye = document.getElementById('eyeRightOuter');
         const glasses = document.getElementById('glassesModel');
-        if (!anchor || !glasses) return;
+        if (!noseAnchor || !leftEye || !rightEye || !glasses) return;
 
-        const quat = new THREE.Quaternion();
-        const euler = new THREE.Euler();
-        const BASE_Y = -0.09;
-        const PITCH_FACTOR = 0.035;
-        let smoothY = BASE_Y;
+        const nosePos = new THREE.Vector3();
+        const lEyePos = new THREE.Vector3();
+        const rEyePos = new THREE.Vector3();
+        const eyeCenter = new THREE.Vector3();
+        const offset = new THREE.Vector3();
+        const inverseQuat = new THREE.Quaternion();
 
-        function pitchTick() {
+        const BLEND_FACTOR = 0.4;  // 0=nose only, 1=eyes only — 0.4 blends toward eyes
+        const SMOOTH_FACTOR = 0.08; // Heavy smoothing for stability
+        let smoothY = -0.09;
+        let smoothX = 0;
+
+        function hybridTick() {
           if (!tryonActive) return;
 
-          // Extract head pitch from anchor's world rotation
-          anchor.object3D.getWorldQuaternion(quat);
-          euler.setFromQuaternion(quat, 'XYZ');
+          // Get world positions
+          noseAnchor.object3D.getWorldPosition(nosePos);
+          leftEye.object3D.getWorldPosition(lEyePos);
+          rightEye.object3D.getWorldPosition(rEyePos);
 
-          // Compute dynamic Y: compensate nose-eye offset based on pitch
-          // When chin down (pitch < 0): nose drops below eyes → need less negative Y
-          // When chin up (pitch > 0): nose rises toward eyes → need more negative Y
-          const targetY = BASE_Y - (euler.x * PITCH_FACTOR);
+          // Eye center in world space
+          eyeCenter.lerpVectors(lEyePos, rEyePos, 0.5);
 
-          // Temporal smoothing (lerp) to avoid jitter — head-locked stability
-          smoothY = smoothY + (targetY - smoothY) * 0.15;
+          // Offset from nose anchor to eye center, in nose's local space
+          offset.copy(eyeCenter).sub(nosePos);
+          noseAnchor.object3D.getWorldQuaternion(inverseQuat);
+          inverseQuat.invert();
+          offset.applyQuaternion(inverseQuat);
+
+          // Blend: base offset + portion of eye correction
+          // offset.y is the structural difference between nose and eyes in local space
+          const targetY = -0.02 + (offset.y * BLEND_FACTOR);
+          const targetX = offset.x * BLEND_FACTOR;
+
+          // Heavy temporal smoothing — eliminates jitter from eye corners
+          smoothY = smoothY + (targetY - smoothY) * SMOOTH_FACTOR;
+          smoothX = smoothX + (targetX - smoothX) * SMOOTH_FACTOR;
 
           glasses.object3D.position.y = smoothY;
+          glasses.object3D.position.x = smoothX;
 
-          requestAnimationFrame(pitchTick);
+          requestAnimationFrame(hybridTick);
         }
 
-        setTimeout(() => requestAnimationFrame(pitchTick), 500);
+        // Wait for all anchors to initialize
+        setTimeout(() => requestAnimationFrame(hybridTick), 800);
       }
 
       // Listen for AR events
       sceneEl.addEventListener('arReady', () => {
         loading.style.display = 'none';
-        startPitchCompensation();
+        startHybridAlignment();
       });
 
       sceneEl.addEventListener('arError', () => {
