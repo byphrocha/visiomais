@@ -716,10 +716,10 @@
 
       container.insertBefore(sceneEl, loading);
 
-      // Hybrid multi-landmark alignment system
-      // - Rotation: from anchor 168 (nose bridge) — fully head-locked
-      // - Y position: blended from nose + eye outer corners — corrects structural bias
-      // - Smoothing: heavy temporal lerp — eliminates jitter
+      // Hybrid multi-landmark calibration system
+      // - Uses eye corners (33/263) ONLY for initial calibration (first ~30 frames)
+      // - After calibration, applies fixed offset — fully head-locked, no gaze influence
+      // - All math done in anchor 168's local coordinate space via full inverse world matrix
       let alignStarted = false;
       function startHybridAlignment() {
         if (alignStarted) return;
@@ -731,52 +731,69 @@
         const glasses = document.getElementById('glassesModel');
         if (!noseAnchor || !leftEye || !rightEye || !glasses) return;
 
-        const nosePos = new THREE.Vector3();
         const lEyePos = new THREE.Vector3();
         const rEyePos = new THREE.Vector3();
         const eyeCenter = new THREE.Vector3();
-        const offset = new THREE.Vector3();
-        const inverseQuat = new THREE.Quaternion();
+        const eyeCenterLocal = new THREE.Vector3();
+        const inverseMatrix = new THREE.Matrix4();
 
-        const BLEND_FACTOR = 0.4;  // 0=nose only, 1=eyes only — 0.4 blends toward eyes
-        const SMOOTH_FACTOR = 0.08; // Heavy smoothing for stability
-        let smoothY = -0.09;
-        let smoothX = 0;
+        // Calibration: collect samples then freeze
+        const CALIBRATION_FRAMES = 30;
+        let calibrationCount = 0;
+        let sumY = 0;
+        let sumX = 0;
+        let calibratedY = -0.09; // fallback
+        let calibratedX = 0;
+        let calibrationDone = false;
+        const BLEND_FACTOR = 0.4;
 
-        function hybridTick() {
+        function calibrationTick() {
           if (!tryonActive) return;
 
-          // Get world positions
-          noseAnchor.object3D.getWorldPosition(nosePos);
-          leftEye.object3D.getWorldPosition(lEyePos);
-          rightEye.object3D.getWorldPosition(rEyePos);
+          if (!calibrationDone) {
+            // Get eye positions in world space
+            leftEye.object3D.getWorldPosition(lEyePos);
+            rightEye.object3D.getWorldPosition(rEyePos);
 
-          // Eye center in world space
-          eyeCenter.lerpVectors(lEyePos, rEyePos, 0.5);
+            // Eye center in world space
+            eyeCenter.lerpVectors(lEyePos, rEyePos, 0.5);
 
-          // Offset from nose anchor to eye center, in nose's local space
-          offset.copy(eyeCenter).sub(nosePos);
-          noseAnchor.object3D.getWorldQuaternion(inverseQuat);
-          inverseQuat.invert();
-          offset.applyQuaternion(inverseQuat);
+            // Convert eye center to nose anchor's LOCAL space using full inverse world matrix
+            inverseMatrix.copy(noseAnchor.object3D.matrixWorld).invert();
+            eyeCenterLocal.copy(eyeCenter).applyMatrix4(inverseMatrix);
 
-          // Blend: base offset + portion of eye correction
-          // offset.y is the structural difference between nose and eyes in local space
-          const targetY = -0.02 + (offset.y * BLEND_FACTOR);
-          const targetX = offset.x * BLEND_FACTOR;
+            // eyeCenterLocal is now the eye center position relative to anchor 168's origin
+            // Accumulate samples
+            sumY += eyeCenterLocal.y;
+            sumX += eyeCenterLocal.x;
+            calibrationCount++;
 
-          // Heavy temporal smoothing — eliminates jitter from eye corners
-          smoothY = smoothY + (targetY - smoothY) * SMOOTH_FACTOR;
-          smoothX = smoothX + (targetX - smoothX) * SMOOTH_FACTOR;
+            if (calibrationCount >= CALIBRATION_FRAMES) {
+              // Average the samples and apply blend factor
+              const avgY = sumY / calibrationCount;
+              const avgX = sumX / calibrationCount;
+              calibratedY = avgY * BLEND_FACTOR;
+              calibratedX = avgX * BLEND_FACTOR;
+              calibrationDone = true;
+            }
 
-          glasses.object3D.position.y = smoothY;
-          glasses.object3D.position.x = smoothX;
+            // During calibration, use progressive values
+            const currentAvgY = sumY / calibrationCount;
+            const currentAvgX = sumX / calibrationCount;
+            glasses.object3D.position.y = currentAvgY * BLEND_FACTOR;
+            glasses.object3D.position.x = currentAvgX * BLEND_FACTOR;
+          } else {
+            // After calibration: fixed offset, fully head-locked
+            // No more reading from eye landmarks — zero gaze influence
+            glasses.object3D.position.y = calibratedY;
+            glasses.object3D.position.x = calibratedX;
+          }
 
-          requestAnimationFrame(hybridTick);
+          requestAnimationFrame(calibrationTick);
         }
 
         // Wait for all anchors to initialize
-        setTimeout(() => requestAnimationFrame(hybridTick), 800);
+        setTimeout(() => requestAnimationFrame(calibrationTick), 1000);
       }
 
       // Listen for AR events
