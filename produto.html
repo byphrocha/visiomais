@@ -638,13 +638,12 @@
       sceneEl.setAttribute('loading-screen', 'enabled: false');
       sceneEl.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;';
 
-      // Build scene — pure head-locked positioning via anchor 168 (nose bridge)
-      // No dynamic eye tracking — fixed offset only, fully stable
+      // Build scene — head-locked via anchor 168 with pitch-compensated Y offset
       sceneEl.innerHTML = `
         <a-camera active="false" position="0 0 0" look-controls="enabled: false"></a-camera>
 
-        <a-entity mindar-face-target="anchorIndex: 168">
-          <a-entity id="glassesModel" position="0 -0.10 0.05" rotation="-5 0 0">
+        <a-entity mindar-face-target="anchorIndex: 168" id="faceAnchor">
+          <a-entity id="glassesModel" position="0 -0.09 0.05" rotation="-3 0 0">
 
             <!-- LEFT LENS GROUP -->
             <a-entity position="-0.21 0 0">
@@ -688,7 +687,7 @@
             <a-sphere position="0.05 -0.09 0.04" radius="0.012"
               material="shader:flat; color:#d8d8d8"></a-sphere>
 
-            <!-- LEFT TEMPLE ARM (starts behind hinge, fully behind face from front view) -->
+            <!-- LEFT TEMPLE ARM -->
             <a-box position="-0.39 0.04 -0.50" width="0.02" height="0.025" depth="0.55"
               material="shader:flat; color:#1a0e08"></a-box>
             <a-box position="-0.39 -0.02 -0.77" width="0.02" height="0.14" depth="0.025"
@@ -700,7 +699,7 @@
             <a-box position="0.39 -0.02 -0.77" width="0.02" height="0.14" depth="0.025"
               material="shader:flat; color:#1a0e08"></a-box>
 
-            <!-- HINGES (pushed behind frame edge) -->
+            <!-- HINGES -->
             <a-box position="-0.385 0.04 -0.05" width="0.03" height="0.03" depth="0.04"
               material="shader:flat; color:#a0a0a0"></a-box>
             <a-box position="0.385 0.04 -0.05" width="0.03" height="0.03" depth="0.04"
@@ -712,9 +711,50 @@
 
       container.insertBefore(sceneEl, loading);
 
+      // Pitch-compensated Y offset (head-locked, NOT eye-locked)
+      // Compensates for nose-to-eye offset varying with head tilt
+      let pitchStarted = false;
+      function startPitchCompensation() {
+        if (pitchStarted) return;
+        pitchStarted = true;
+
+        const anchor = document.getElementById('faceAnchor');
+        const glasses = document.getElementById('glassesModel');
+        if (!anchor || !glasses) return;
+
+        const quat = new THREE.Quaternion();
+        const euler = new THREE.Euler();
+        const BASE_Y = -0.09;
+        const PITCH_FACTOR = 0.035;
+        let smoothY = BASE_Y;
+
+        function pitchTick() {
+          if (!tryonActive) return;
+
+          // Extract head pitch from anchor's world rotation
+          anchor.object3D.getWorldQuaternion(quat);
+          euler.setFromQuaternion(quat, 'XYZ');
+
+          // Compute dynamic Y: compensate nose-eye offset based on pitch
+          // When chin down (pitch < 0): nose drops below eyes → need less negative Y
+          // When chin up (pitch > 0): nose rises toward eyes → need more negative Y
+          const targetY = BASE_Y - (euler.x * PITCH_FACTOR);
+
+          // Temporal smoothing (lerp) to avoid jitter — head-locked stability
+          smoothY = smoothY + (targetY - smoothY) * 0.15;
+
+          glasses.object3D.position.y = smoothY;
+
+          requestAnimationFrame(pitchTick);
+        }
+
+        setTimeout(() => requestAnimationFrame(pitchTick), 500);
+      }
+
       // Listen for AR events
       sceneEl.addEventListener('arReady', () => {
         loading.style.display = 'none';
+        startPitchCompensation();
       });
 
       sceneEl.addEventListener('arError', () => {
