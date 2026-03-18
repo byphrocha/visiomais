@@ -738,6 +738,9 @@
         const glasses = document.getElementById('glassesModel');
         if (!noseAnchor || !leftEye || !rightEye || !faceLeft || !faceRight || !glasses) return;
 
+        // Hide glasses until calibration is complete — prevents visual "jump"
+        glasses.object3D.visible = false;
+
         const lEyePos = new THREE.Vector3();
         const rEyePos = new THREE.Vector3();
         const faceLeftPos = new THREE.Vector3();
@@ -759,71 +762,85 @@
         let calibratedScale = 1;
         let calibrationDone = false;
         const BLEND_FACTOR = 0.4;
-        // Reference face width: model total width is ~0.82 (hinges at ±0.385)
-        // Face width landmarks (234/454) measure actual head width
         const REF_FACE_WIDTH = 0.82;
-        const SCALE_CORRECTION = 0.6; // Correction factor for unit mismatch
+        const SCALE_CORRECTION = 0.6;
+
+        // Fade-in animation after calibration
+        let fadeProgress = 0;
+        const FADE_SPEED = 0.05; // 20 frames to fully appear
 
         function calibrationTick() {
           if (!tryonActive) return;
 
           if (!calibrationDone) {
-            // Get positions in world space
+            // Glasses hidden during calibration — no visual output
             leftEye.object3D.getWorldPosition(lEyePos);
             rightEye.object3D.getWorldPosition(rEyePos);
             faceLeft.object3D.getWorldPosition(faceLeftPos);
             faceRight.object3D.getWorldPosition(faceRightPos);
 
-            // Eye center in world space
             eyeCenter.lerpVectors(lEyePos, rEyePos, 0.5);
 
-            // Convert all points to nose anchor's LOCAL space using full inverse world matrix
             inverseMatrix.copy(noseAnchor.object3D.matrixWorld).invert();
             eyeCenterLocal.copy(eyeCenter).applyMatrix4(inverseMatrix);
             faceLeftLocal.copy(faceLeftPos).applyMatrix4(inverseMatrix);
             faceRightLocal.copy(faceRightPos).applyMatrix4(inverseMatrix);
 
-            // Face width in local space (lateral cheekbone points — true head width)
             const faceWidth = faceLeftLocal.distanceTo(faceRightLocal);
 
-            // Accumulate samples
             sumY += eyeCenterLocal.y;
             sumX += eyeCenterLocal.x;
             sumFaceWidth += faceWidth;
             calibrationCount++;
 
             if (calibrationCount >= CALIBRATION_FRAMES) {
-              // Average the samples and apply blend factor
               const avgY = sumY / calibrationCount;
               const avgX = sumX / calibrationCount;
               const avgFaceWidth = sumFaceWidth / calibrationCount;
               calibratedY = avgY * BLEND_FACTOR;
               calibratedX = avgX * BLEND_FACTOR;
-              // Scale glasses to match face width with correction factor
               calibratedScale = (avgFaceWidth / REF_FACE_WIDTH) * SCALE_CORRECTION;
-              // Clamp scale to reasonable range
               calibratedScale = Math.max(0.7, Math.min(1.3, calibratedScale));
               calibrationDone = true;
-              glasses.object3D.scale.set(calibratedScale, calibratedScale, calibratedScale);
-            }
 
-            // During calibration, use progressive values
-            const currentAvgY = sumY / calibrationCount;
-            const currentAvgX = sumX / calibrationCount;
-            glasses.object3D.position.y = currentAvgY * BLEND_FACTOR;
-            glasses.object3D.position.x = currentAvgX * BLEND_FACTOR;
+              // Apply final calibrated values before showing
+              glasses.object3D.position.y = calibratedY;
+              glasses.object3D.position.x = calibratedX;
+              glasses.object3D.scale.set(calibratedScale, calibratedScale, calibratedScale);
+              // Make visible and start fade-in
+              glasses.object3D.visible = true;
+            }
           } else {
             // After calibration: fixed offset + scale, fully head-locked
-            // No more reading from eye landmarks — zero gaze influence
             glasses.object3D.position.y = calibratedY;
             glasses.object3D.position.x = calibratedX;
+
+            // Smooth fade-in via opacity on all child materials
+            if (fadeProgress < 1) {
+              fadeProgress = Math.min(1, fadeProgress + FADE_SPEED);
+              glasses.object3D.traverse(function(child) {
+                if (child.material) {
+                  child.material.opacity = child.material._targetOpacity !== undefined
+                    ? child.material._targetOpacity * fadeProgress
+                    : fadeProgress;
+                  child.material.transparent = true;
+                }
+              });
+            }
           }
 
           requestAnimationFrame(calibrationTick);
         }
 
-        // Wait for all anchors to initialize
-        setTimeout(() => requestAnimationFrame(calibrationTick), 1000);
+        // Store original opacities before fade-in starts
+        setTimeout(() => {
+          glasses.object3D.traverse(function(child) {
+            if (child.material) {
+              child.material._targetOpacity = child.material.opacity !== undefined ? child.material.opacity : 1;
+            }
+          });
+          requestAnimationFrame(calibrationTick);
+        }, 1000);
       }
 
       // Listen for AR events
