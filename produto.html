@@ -709,9 +709,10 @@
           </a-entity>
         </a-entity>
 
-        <!-- Invisible eye reference anchors for dynamic Y alignment -->
-        <a-entity mindar-face-target="anchorIndex: 159" id="leftEyeAnchor" visible="false"></a-entity>
-        <a-entity mindar-face-target="anchorIndex: 386" id="rightEyeAnchor" visible="false"></a-entity>
+        <!-- Structural eye corner anchors (head-locked, not gaze-locked) -->
+        <!-- 133 = left eye outer corner, 362 = right eye outer corner -->
+        <a-entity mindar-face-target="anchorIndex: 133" id="leftEyeAnchor" visible="false"></a-entity>
+        <a-entity mindar-face-target="anchorIndex: 362" id="rightEyeAnchor" visible="false"></a-entity>
       `;
 
       container.insertBefore(sceneEl, loading);
@@ -751,9 +752,10 @@
           inverseQuat.invert();
           offset.applyQuaternion(inverseQuat);
 
-          // Apply only X and Y offset (keep Z as forward offset for glasses)
+          // Apply X and Y offset with small fixed correction
+          // Outer eye corners are slightly above lens center, so add small downward offset
           glasses.object3D.position.x = offset.x;
-          glasses.object3D.position.y = offset.y;
+          glasses.object3D.position.y = offset.y - 0.02;
           // Z stays at 0.08 (forward from face)
 
           requestAnimationFrame(alignTick);
