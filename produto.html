@@ -688,23 +688,25 @@
             <a-sphere position="0.05 -0.09 0.04" radius="0.012"
               material="shader:flat; color:#d8d8d8"></a-sphere>
 
-            <!-- LEFT TEMPLE ARM -->
-            <a-box position="-0.39 0.04 -0.50" width="0.02" height="0.025" depth="0.55"
-              material="shader:flat; color:#1a0e08"></a-box>
-            <a-box position="-0.39 -0.02 -0.77" width="0.02" height="0.14" depth="0.025"
-              material="shader:flat; color:#1a0e08"></a-box>
+            <!-- LEFT TEMPLE (pivoted at hinge, rotated inward toward ear) -->
+            <a-entity position="-0.385 0.04 -0.05" rotation="0 7 0">
+              <a-box position="0 0 0" width="0.03" height="0.03" depth="0.04"
+                material="shader:flat; color:#a0a0a0"></a-box>
+              <a-box position="-0.005 0 -0.45" width="0.02" height="0.025" depth="0.55"
+                material="shader:flat; color:#1a0e08"></a-box>
+              <a-box position="-0.005 -0.06 -0.72" width="0.02" height="0.14" depth="0.025"
+                material="shader:flat; color:#1a0e08"></a-box>
+            </a-entity>
 
-            <!-- RIGHT TEMPLE ARM -->
-            <a-box position="0.39 0.04 -0.50" width="0.02" height="0.025" depth="0.55"
-              material="shader:flat; color:#1a0e08"></a-box>
-            <a-box position="0.39 -0.02 -0.77" width="0.02" height="0.14" depth="0.025"
-              material="shader:flat; color:#1a0e08"></a-box>
-
-            <!-- HINGES -->
-            <a-box position="-0.385 0.04 -0.05" width="0.03" height="0.03" depth="0.04"
-              material="shader:flat; color:#a0a0a0"></a-box>
-            <a-box position="0.385 0.04 -0.05" width="0.03" height="0.03" depth="0.04"
-              material="shader:flat; color:#a0a0a0"></a-box>
+            <!-- RIGHT TEMPLE (pivoted at hinge, rotated inward toward ear) -->
+            <a-entity position="0.385 0.04 -0.05" rotation="0 -7 0">
+              <a-box position="0 0 0" width="0.03" height="0.03" depth="0.04"
+                material="shader:flat; color:#a0a0a0"></a-box>
+              <a-box position="0.005 0 -0.45" width="0.02" height="0.025" depth="0.55"
+                material="shader:flat; color:#1a0e08"></a-box>
+              <a-box position="0.005 -0.06 -0.72" width="0.02" height="0.14" depth="0.025"
+                material="shader:flat; color:#1a0e08"></a-box>
+            </a-entity>
 
           </a-entity>
         </a-entity>
@@ -735,6 +737,8 @@
         const rEyePos = new THREE.Vector3();
         const eyeCenter = new THREE.Vector3();
         const eyeCenterLocal = new THREE.Vector3();
+        const lEyeLocal = new THREE.Vector3();
+        const rEyeLocal = new THREE.Vector3();
         const inverseMatrix = new THREE.Matrix4();
 
         // Calibration: collect samples then freeze
@@ -742,10 +746,14 @@
         let calibrationCount = 0;
         let sumY = 0;
         let sumX = 0;
+        let sumEyeDist = 0;
         let calibratedY = -0.09; // fallback
         let calibratedX = 0;
+        let calibratedScale = 1;
         let calibrationDone = false;
         const BLEND_FACTOR = 0.4;
+        // Reference inter-eye distance in model space (lens centers at ±0.21)
+        const REF_EYE_DIST = 0.42;
 
         function calibrationTick() {
           if (!tryonActive) return;
@@ -758,23 +766,34 @@
             // Eye center in world space
             eyeCenter.lerpVectors(lEyePos, rEyePos, 0.5);
 
-            // Convert eye center to nose anchor's LOCAL space using full inverse world matrix
+            // Convert all points to nose anchor's LOCAL space using full inverse world matrix
             inverseMatrix.copy(noseAnchor.object3D.matrixWorld).invert();
             eyeCenterLocal.copy(eyeCenter).applyMatrix4(inverseMatrix);
+            lEyeLocal.copy(lEyePos).applyMatrix4(inverseMatrix);
+            rEyeLocal.copy(rEyePos).applyMatrix4(inverseMatrix);
 
-            // eyeCenterLocal is now the eye center position relative to anchor 168's origin
+            // Inter-eye distance in local space (for dynamic scaling)
+            const eyeDist = lEyeLocal.distanceTo(rEyeLocal);
+
             // Accumulate samples
             sumY += eyeCenterLocal.y;
             sumX += eyeCenterLocal.x;
+            sumEyeDist += eyeDist;
             calibrationCount++;
 
             if (calibrationCount >= CALIBRATION_FRAMES) {
               // Average the samples and apply blend factor
               const avgY = sumY / calibrationCount;
               const avgX = sumX / calibrationCount;
+              const avgEyeDist = sumEyeDist / calibrationCount;
               calibratedY = avgY * BLEND_FACTOR;
               calibratedX = avgX * BLEND_FACTOR;
+              // Scale glasses to match face width
+              calibratedScale = avgEyeDist / REF_EYE_DIST;
+              // Clamp scale to reasonable range
+              calibratedScale = Math.max(0.7, Math.min(1.5, calibratedScale));
               calibrationDone = true;
+              glasses.object3D.scale.set(calibratedScale, calibratedScale, calibratedScale);
             }
 
             // During calibration, use progressive values
@@ -783,7 +802,7 @@
             glasses.object3D.position.y = currentAvgY * BLEND_FACTOR;
             glasses.object3D.position.x = currentAvgX * BLEND_FACTOR;
           } else {
-            // After calibration: fixed offset, fully head-locked
+            // After calibration: fixed offset + scale, fully head-locked
             // No more reading from eye landmarks — zero gaze influence
             glasses.object3D.position.y = calibratedY;
             glasses.object3D.position.x = calibratedX;
