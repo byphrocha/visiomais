@@ -643,66 +643,74 @@
         <a-camera active="false" position="0 0 0" look-controls="enabled: false"></a-camera>
 
         <a-entity mindar-face-target="anchorIndex: 168">
-          <a-entity id="glassesModel" position="0 0.05 0.1">
+          <a-entity id="glassesModel" position="0 -0.08 0.08">
 
             <!-- LEFT LENS GROUP -->
-            <a-entity position="-0.22 0 0">
-              <a-box position="0 0.09 0" width="0.40" height="0.06" depth="0.05"
+            <a-entity position="-0.21 0 0">
+              <!-- Browline (dark tortoise acetate) -->
+              <a-box position="0 0.06 0" width="0.38" height="0.04" depth="0.03"
                 material="shader:flat; color:#1a0e08"></a-box>
-              <a-box position="0 0.12 -0.01" width="0.38" height="0.02" depth="0.04"
+              <!-- Browline accent top -->
+              <a-box position="0 0.085 -0.005" width="0.36" height="0.015" depth="0.025"
                 material="shader:flat; color:#3d2517"></a-box>
-              <a-plane position="0 0 0.02" width="0.36" height="0.26"
-                material="shader:flat; color:#c8e0ff; opacity:0.1; side:double"></a-plane>
-              <a-box position="0 -0.12 0" width="0.40" height="0.015" depth="0.03"
-                material="shader:flat; color:#b8b8b8"></a-box>
-              <a-box position="-0.19 -0.02 0" width="0.015" height="0.20" depth="0.03"
-                material="shader:flat; color:#b8b8b8"></a-box>
-              <a-box position="0.19 -0.02 0" width="0.015" height="0.20" depth="0.03"
-                material="shader:flat; color:#b8b8b8"></a-box>
+              <!-- Lens (transparent) -->
+              <a-plane position="0 0 0.015" width="0.34" height="0.22"
+                material="shader:flat; color:#c8e0ff; opacity:0.08; side:double"></a-plane>
+              <!-- Bottom rim (very thin wire) -->
+              <a-box position="0 -0.10 0" width="0.36" height="0.008" depth="0.015"
+                material="shader:flat; color:#c0c0c0"></a-box>
+              <!-- Left side rim wire -->
+              <a-box position="-0.175 -0.02 0" width="0.008" height="0.16" depth="0.015"
+                material="shader:flat; color:#c0c0c0"></a-box>
+              <!-- Right side rim wire (near bridge) -->
+              <a-box position="0.175 -0.02 0" width="0.008" height="0.16" depth="0.015"
+                material="shader:flat; color:#c0c0c0"></a-box>
             </a-entity>
 
             <!-- RIGHT LENS GROUP (mirror of left) -->
-            <a-entity position="0.22 0 0">
-              <a-box position="0 0.09 0" width="0.40" height="0.06" depth="0.05"
+            <a-entity position="0.21 0 0">
+              <a-box position="0 0.06 0" width="0.38" height="0.04" depth="0.03"
                 material="shader:flat; color:#1a0e08"></a-box>
-              <a-box position="0 0.12 -0.01" width="0.38" height="0.02" depth="0.04"
+              <a-box position="0 0.085 -0.005" width="0.36" height="0.015" depth="0.025"
                 material="shader:flat; color:#3d2517"></a-box>
-              <a-plane position="0 0 0.02" width="0.36" height="0.26"
-                material="shader:flat; color:#c8e0ff; opacity:0.1; side:double"></a-plane>
-              <a-box position="0 -0.12 0" width="0.40" height="0.015" depth="0.03"
-                material="shader:flat; color:#b8b8b8"></a-box>
-              <a-box position="-0.19 -0.02 0" width="0.015" height="0.20" depth="0.03"
-                material="shader:flat; color:#b8b8b8"></a-box>
-              <a-box position="0.19 -0.02 0" width="0.015" height="0.20" depth="0.03"
-                material="shader:flat; color:#b8b8b8"></a-box>
+              <a-plane position="0 0 0.015" width="0.34" height="0.22"
+                material="shader:flat; color:#c8e0ff; opacity:0.08; side:double"></a-plane>
+              <a-box position="0 -0.10 0" width="0.36" height="0.008" depth="0.015"
+                material="shader:flat; color:#c0c0c0"></a-box>
+              <a-box position="-0.175 -0.02 0" width="0.008" height="0.16" depth="0.015"
+                material="shader:flat; color:#c0c0c0"></a-box>
+              <a-box position="0.175 -0.02 0" width="0.008" height="0.16" depth="0.015"
+                material="shader:flat; color:#c0c0c0"></a-box>
             </a-entity>
 
             <!-- NOSE BRIDGE -->
-            <a-box position="0 -0.02 0.03" width="0.07" height="0.02" depth="0.03"
-              material="shader:flat; color:#b8b8b8"></a-box>
+            <a-box position="0 -0.03 0.02" width="0.06" height="0.012" depth="0.02"
+              material="shader:flat; color:#c0c0c0"></a-box>
 
             <!-- NOSE PADS -->
-            <a-sphere position="-0.06 -0.10 0.06" radius="0.02"
+            <a-sphere position="-0.05 -0.09 0.04" radius="0.012"
               material="shader:flat; color:#d8d8d8"></a-sphere>
-            <a-sphere position="0.06 -0.10 0.06" radius="0.02"
+            <a-sphere position="0.05 -0.09 0.04" radius="0.012"
               material="shader:flat; color:#d8d8d8"></a-sphere>
 
-            <!-- LEFT TEMPLE ARM -->
-            <a-box position="-0.41 0.07 -0.35" width="0.03" height="0.035" depth="0.75"
+            <!-- LEFT TEMPLE ARM (starts behind hinge, extends backward) -->
+            <a-box position="-0.39 0.04 -0.45" width="0.02" height="0.025" depth="0.65"
               material="shader:flat; color:#1a0e08"></a-box>
-            <a-box position="-0.41 -0.03 -0.72" width="0.03" height="0.20" depth="0.035"
+            <!-- Left temple tip -->
+            <a-box position="-0.39 -0.02 -0.77" width="0.02" height="0.14" depth="0.025"
               material="shader:flat; color:#1a0e08"></a-box>
 
             <!-- RIGHT TEMPLE ARM -->
-            <a-box position="0.41 0.07 -0.35" width="0.03" height="0.035" depth="0.75"
+            <a-box position="0.39 0.04 -0.45" width="0.02" height="0.025" depth="0.65"
               material="shader:flat; color:#1a0e08"></a-box>
-            <a-box position="0.41 -0.03 -0.72" width="0.03" height="0.20" depth="0.035"
+            <!-- Right temple tip -->
+            <a-box position="0.39 -0.02 -0.77" width="0.02" height="0.14" depth="0.025"
               material="shader:flat; color:#1a0e08"></a-box>
 
-            <!-- HINGES -->
-            <a-box position="-0.40 0.07 0.02" width="0.05" height="0.04" depth="0.05"
+            <!-- HINGES (small, at frame edge) -->
+            <a-box position="-0.385 0.04 -0.01" width="0.03" height="0.03" depth="0.04"
               material="shader:flat; color:#a0a0a0"></a-box>
-            <a-box position="0.40 0.07 0.02" width="0.05" height="0.04" depth="0.05"
+            <a-box position="0.385 0.04 -0.01" width="0.03" height="0.03" depth="0.04"
               material="shader:flat; color:#a0a0a0"></a-box>
 
           </a-entity>
